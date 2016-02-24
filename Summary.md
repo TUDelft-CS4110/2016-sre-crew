@@ -11,7 +11,7 @@ The process of fuzzing consists in 4 main steps:
 4. If the application fails the submitted data would be stored for further analysis.  
 
 This process is represented in the picture below.   
-![Fuzzing flowchart](/images/2016/02/fuzzing flowchart.png)  
+![Fuzzing flowchart](/img/fuzzing flowchart.png)  
 Performing this task manually would require a lot of time.
 Being able to automate the whole process let developers and quality assurance teams take care just of the final analysis while the fuzzer perform its task hundred or even thousands of times.
 
