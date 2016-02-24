@@ -30,6 +30,13 @@ These data are going to be used as template for malformed data creation so that 
 When a good dataset is already present data mutation usually is the preferred path to follow since it requires less effort in creating the fuzzer.
 On the other hands sometimes trying to mutate data that has to follow strict protocols might require much effort than creating the data directly from scratch.
 
+Finally once decided whether to generate new data or mutate previously held data there are 3 possible implementation of a fuzzer:
+- **Unintelligent fuzzer:** Generates random inputs to submit to the application (sometimes this is preferred cause it can reach conditions totally unexpected).
+
+- **Intelligent fuzzer:** Generates data that conform specifics of the application so that it knows that it with those data it will pass specific checks.  
+
+- **Pattern-based fuzzer:** The most cost-effective solution that provides results almost at the level of the intelligent fuzzer and consists in identifying specific patterns in the results of the execution and, once identified, use these latter to generate the next inputs.
+
 ## Smart Fuzzing
 Although fuzzing is a fast technique to detect error, there is room for improvement. The main drawbacks of fuzz testing are its poor coverage and quality of tests.In [CITE PAPER] there have been various suggestions to improve fuzzing.
 
