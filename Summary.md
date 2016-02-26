@@ -4,18 +4,18 @@
 Fuzzing is an automated testing technique used to cover boundary test cases providing the application with newly generated inputs.
 Creating negative test cases (test cases that check that the system doesn't do something it is not supposed to do) is an incredibly difficult task.
 Fuzz testing helps developers in this task creating _semi-valid_ input for tests.
-These inputs are valid in the sense that they pass parser checks and they are not stopped before getting to the part of code under test, however they are malformed enough to cause unexpected behaviors in the application.  
-The process of fuzzing consists in 4 main steps [Pic. 1]:
+These inputs are valid in the sense that they pass parser checks and they are not stopped before getting to the part of code under test, however they are malformed enough to cause unexpected behaviors in the application. 
+The process of fuzzing consists in 4 main steps [Pic. 1]:  
+
 1. Getting malformed data  
 2. Submitting the data to the application under test
 3. Checking if the application fails
 4. And, if the application fails, storing the submitted data for further analysis.  
 
-<figure style="float: right; margin-left:8px; margin-top:8px">
-<img src="/img/fuzzing flowchart.png">
-<figcaption align="center">**Pic. 1 - Fuzzing Flowchart**</figcaption>
-</figure>
-
+<div >
+<img align="right" style="margin-left:10px; margin-top:10px" src="/img/fuzzing flowchart.png">
+<span>asd</span>
+</div>
 Performing this task manually would require a lot of time.
 Being able to automate the whole process let developers and quality assurance teams take care just of the final analysis while the fuzzer perform its task hundred or even thousands of times.
 
@@ -96,7 +96,7 @@ Finally relevant outputs are saved for further analysis under 4 different catego
 
 ![Android test generation](/img/android.png)
 
-<p align="center">**Pic. 2 Android test generation**</p>
+<p align="center">Pic. 2 Android test generation</p>
 
 ## Fuzzing on embedded devices (Firmalice)
 
