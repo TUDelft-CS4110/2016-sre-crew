@@ -16,7 +16,7 @@ Performing this task manually would require a lot of time.
 Being able to automate the whole process let developers and quality assurance teams take care just of the final analysis while the fuzzer perform its task hundred or even thousands of times.
 
 The main purpose of fuzzing is to test trust boundary conditions.
-These are the most relevant conditions since their locations in code are locations where vulnerabilities would result in elevation of privileges.  
+These are the most relevant conditions since their locations in code are those where vulnerabilities would result in elevation of privileges.  
 Therefore before getting into the 4 steps aforementioned a proper threat analysis is needed.
 All input sources (files, APIs, user interfaces, command line arguments, etc.) are possible target for fuzzing however it is worth to take some time to analyze those when it comes to fuzzing to prioritize the most important in term of trust boundaries.  
 
@@ -62,7 +62,19 @@ In order to improve fuzzing with these techniques we need to be able to measure 
 ## Sage
 
 ## Android Section
+Fuzzing is employed as testing technique also in mobile environment.
+Mahmood R. et al. [cite android paper] developed a fuzzing system that can be used to test Android applications.
+This can be employed for testing code under development but also already existing apps (in this case the apk needs to be decompiled in order to obtain from the java bytecode a representation of the source code).  
+As explained above, before starting with the process of fuzzing it is necessary to identify the input surface.
+To do so the _architectural model_ and the _call graph model_ [Picture 2] come into place.
+The architectural model tells the fuzzer which is the main _activity_ (activities are screen presented to the user) of the application.
+Using the call graph model, instead, the input surface is defined identifying GUI inputs accepted by activities and all the other inputs accepted by _services_ (services are processes run in the background from the application).  
+Retrieved the input surface test cases are generated mixing this information with templates already existing in the system.  
+As mentioned above code coverage represents a big issue while testing, for this reason different inputs are generated using ad-hoc fuzzers (these generate inputs based on the specific input domain: text, numbers, etc.), and improved every round checking the current test coverage.  
+With the intent of optimizing the process these generated test cases are run on multiple parallel virtual machines on a cloud environment.   
+Finally relevant outputs are saved for further analysis under 4 different categories: _Interface_, _Interaction_, _Permissions_ and _Resources_.
 
+![Android test generation](/img/android.png)
 ## Firmalice
 
 Nowadays embedded devices are used in a range of applications of different subject and increase in a fast pace. As a result the security of these devices is a matter of importance and Firmalice was created to address this issue. Firmalice is binary analysis framework that supports the analysis of firmware on these devices. It tried to detect authentication bypasses which can be considered a user performing a privileged action without credentials. These bypasses are difficult to detect because the source code of the firmware is not available, it usually is in the form of a single binary image and the embedded devices frequently require their firmware to be cryptographically signed by the manufacturer. The advantages of this framework is that is does not require source code, its approach scales on multiple devices and it is not based on instrumentation and execution monitoring of firmware. Firmalice performs the following steps in order to detect vunlerabilities in firmware :
