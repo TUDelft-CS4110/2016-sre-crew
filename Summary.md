@@ -46,7 +46,8 @@ There are two modern solutions to these problems which are **Concolic Testing** 
  The main advantage of using these dynamic techniques such as Concolic Testing and EGT is that by using concrete values it is possible to alleviate imprecision due to external code and constraint solving timeouts. For the former example of x = twice(y), now it is possible to use the concrete value of y to get an actual value of x, e.g. 18 = twice(9).
 
 
- ### **Key challenges of symbolic execution**
+
+### **Key challenges of symbolic execution**
  * **Path Explosion**: In all but very small programs the number of program paths can be huge (usually exponential in the number of static branches). Therefore it is necessary to explore the most relevant paths first.Symbolic execution already filters out paths which do not depend on the symbolic input and are infeasible given current path constraints. In addition to solve this problem, **heuristic techniques** and **sound program analysis techniques** have been used. **Heuristic techniques** include using **static control-flow graphs (CFG), random exploration, random testing, evolutionary search** and **mutation testing**. **Sound program analysis techniques**  reduce the complexity of path exploration by using ideas from program analysis and software verification. These techniques involve merging explored paths or using compositional techniques by caching and reusing analysis of lower-level functions in subsequent computations
  * **Constraint Solving**: Even though recent advances in Constraint Solving have allowed for practical Symbolic Execution it still remains as the biggest bottleneck. Two types of optimizations are commonly used for this problem; **Irrelevant constraint elimination** and **Increment solving**. The former tries to remove from the path conditions the constraints that are irrelevant in deciding the outcome of the current branch. The latter tries to reuse the results of previous similar queries. The counter-example caching scheme is an example of the latter which utilizes cached supersets and subsets of constraints.
  * Other problems involve **Memory modeling** and **Handling concurrency**.
@@ -58,7 +59,7 @@ There are several modern tools that implement dynamic symbolic execution.
 * Other industry tools include **SAGE** (Microsoft) for x86 binaries and **PEX** for .NET.
 
 ## Improvements
-Although fuzzing is a fast technique to detect error, there is room for improvement. The main drawbacks of fuzz testing are its poor coverage and quality of tests.In [CITE PAPER] there have been various suggestions to improve fuzzing.
+Although fuzzing is a fast technique to detect error, there is room for improvement. The main drawbacks of fuzz testing are its poor coverage and quality of tests. There have been various suggestions to improve fuzzing and below we list some of them :
 
 ### Vulnerability Pattern
 By analysing the binary code, potentially vulnerable sequences of code can be discovered that can lead to a fault in the execution of the program. The discovery of  these patterns will help to identify interesting points in the binary that require more focus. For example a vulnerable pattern can be a code that uses vulnerable functions such as _strcmp_.
