@@ -4,39 +4,35 @@
 Fuzzing is an automated testing technique used to cover boundary test cases providing the application with newly generated inputs.
 Creating negative test cases (test cases that check that the system doesn't do something it is not supposed to do) is an incredibly difficult task.
 Fuzz testing helps developers in this task creating _semi-valid_ input for tests.
-These inputs are valid in the sense that they pass parser checks and they are not stopped before getting to the part of code under test, however they are malformed enough to cause unexpected behaviors in the application.
-The process of fuzzing consists in 4 main steps:
-1. Get malformed data  
-2. Submit the data to the application under test
-3. Check if the application fails
-4. If the application fails the submitted data would be stored for further analysis.  
+These inputs are valid in the sense that they pass parser checks and they are not stopped before getting to the part of code under test, however they are malformed enough to cause unexpected behaviors in the application. 
+The process of fuzzing consists in 4 main steps [Pic. 1]:  
 
-This process is represented in the picture below.   
-![Fuzzing flowchart](/img/fuzzing flowchart.png)  
+1. Getting malformed data  
+2. Submitting the data to the application under test
+3. Checking if the application fails
+4. And, if the application fails, storing the submitted data for further analysis.  
+
+<div >
+<img align="right" style="margin-left:10px; margin-top:10px" src="/img/fuzzing flowchart.png">
+<span>asd</span>
+</div>
 Performing this task manually would require a lot of time.
 Being able to automate the whole process let developers and quality assurance teams take care just of the final analysis while the fuzzer perform its task hundred or even thousands of times.
 
 The main purpose of fuzzing is to test trust boundary conditions.
-These are the most relevant conditions since their locations in code are those where vulnerabilities would result in elevation of privileges.  
+These are the most relevant conditions since their locations in the code are those where vulnerabilities would result in elevation of privileges.  
 Therefore before getting into the 4 steps aforementioned a proper threat analysis is needed.
-All input sources (files, APIs, user interfaces, command line arguments, etc.) are possible target for fuzzing however it is worth to take some time to analyze those when it comes to fuzzing to prioritize the most important in term of trust boundaries.  
+All input sources (files, APIs, user interfaces, command line arguments, etc.) are possible target for fuzzing. Nonetheless, it is worth to take some time to analyze these when it comes to fuzzing, to prioritize the most important in term of trust boundaries.  
 
 Once chosen the inputs to fuzz it is possible to get the data (step 1) in two ways:
 - **Data generation:** It consists in generating data based on a specification that defines how the data should look.
-This specification can be of different natures.
-The only things that matter is that it has to be unambiguous so that the fuzzer will generate proper data to pass to the application.
+This specification can be of different natures, it just needs to be unambiguous so that the fuzzer will generate proper data to pass to the application.
 
 - **Data mutation:** This, instead, consists in modifying a set of data that is already of team's property.
-These data are going to be used as template for malformed data creation so that the possibility of passing parsers' checks are higher.
+These data are going to be used as templates for malformed data creation so that the possibility of passing parsers' checks are higher.
 When a good dataset is already present data mutation usually is the preferred path to follow since it requires less effort in creating the fuzzer.
-On the other hands sometimes trying to mutate data that has to follow strict protocols might require much effort than creating the data directly from scratch.
+On the other hand sometimes trying to mutate data that has to follow strict protocols might require much effort than creating the data directly from scratch.
 
-Finally once decided whether to generate new data or mutate previously held data there are 3 possible implementation of a fuzzer:
-- **Unintelligent fuzzer:** Generates random inputs to submit to the application (sometimes this is preferred cause it can reach conditions totally unexpected).
-
-- **Intelligent fuzzer:** Generates data that conform specifics of the application so that it knows that it with those data it will pass specific checks.  
-
-- **Pattern-based fuzzer:** The most cost-effective solution that provides results almost at the level of the intelligent fuzzer and consists in identifying specific patterns in the results of the execution and, once identified, use these latter to generate the next inputs.
 
 ## Symbolic Testing
 The goal of symbolic execution is to explore as many program paths as possible in a given amount of time and for each path generate a set of concrete input values exercising that path. It should also check for various kinds of errors like assertion violations, uncaught exceptions, security vulnerabilities and memory corruption. The idea behind symbolic execution is to use symbolic values instead of concrete data values as input, which results in making output values a function of the symbolic input values, and to represent the values of program variables as symbolic expressions over the symbolic input values. During symbolic execution a state σ (sigma) is maintained which maps variables to symbolic expression. A path constraint, PC, is also maintained which is a quantifier-free first-order formula over symbolic expressions. The state σ is initialized to an empty map and is updated at every assignment to contain something like {z -> 2y}. PC is initialized to true, updated with every conditional statement and in the end it is solved with a constraint solver to generate a concrete input for that execution path. At every update, PC becomes PC ^ σ(e) for the “then” branch and a new path constraint PC’ is created which is initialized to PC ^ ¬σ(e). If PC or PC’ are satisfiable for some assignment of concrete to symbolic values, symbolic execution continues for PC in the “then” branch or is created for PC’ for the “else” branch. Symbolic execution terminates if any of PC or PC’ is not satisfiable. If the symbolic execution hits an exit statement or an error, the execution is terminated and a constraint solver is used to form an input from the PC. The main disadvantage to classical symbolic execution is that it cannot create an input if the PC along an execution path contains formulas that can not be efficiently solved with a constraint solver. For example, if a program contains the statement x = twice(y), where twice is an uninterpreted function in a library, the constraint solver can not solve it since they don’t know how to manipulate x. In this case, the symbolic execution will fail to generate any input.
@@ -81,16 +77,16 @@ In order to improve fuzzing with these techniques we need to be able to measure 
 
 
 ## Sage : Whitebox Fuzzing for Security Testing
-
+With whitebox fuzzing the program is dynamically executed symbolically, gathering constraints on inputs from conditional branches encountered in the execution. These constraints are then negated and solved with a constraint solver, which is mapped into new inputs to execute the program. This can be very effective to verify programs and can discovers many corner cases. This process can however be imprecise due to complex program statements and incomplete due to a large amount of execution paths in a program.
 The first implementation of whitebox fuzzing was SAGE (Scalable Automated Guided Execution). SAGE implements generational search that maximizes the number of new input test generated for each symbolic execution. With a normal breadth-first or depth-first search it takes too long time if only one input is found per execution since there can be a great amount of execution paths. This is done by negating all constraints one by one on an execution path and placing them in a conjunction with the previous negations of the path. These are then solved by a constraint solver and multiple tests are created. SAGE works at the x86 binary level so it can be used on any program regardless of its source language or build process.
 	SAGE has been used extensively by Microsoft. With Windows 7, SAGE is run last to find bugs after static program analysis and blackbox fuzzing, but still managed to find one-third of all bugs in Windows 7 discovered by file fuzzing. In general, blackbox fuzzing is simple, lightweight and fast but whitebox fuzzing smarter but more complex. It is therefore good practice to first apply blackbox fuzzing to find the easier bugs and then apply whitebox fuzzing to find more bugs.
 
 ## Fuzzing on Android Devices
 Fuzzing is employed as testing technique also in mobile environment.
-Mahmood R. et al. [cite android paper] developed a fuzzing system that can be used to test Android applications.
+Mahmood R. et al. developed a fuzzing system that can be used to test Android applications.
 This can be employed for testing code under development but also already existing apps (in this case the apk needs to be decompiled in order to obtain from the java bytecode a representation of the source code).  
 As explained above, before starting with the process of fuzzing it is necessary to identify the input surface.
-To do so the _architectural model_ and the _call graph model_ [Picture 2] come into place.
+To do so the _architectural model_ and the _call graph model_ [Pic. 2] come into place.
 The architectural model tells the fuzzer which is the main _activity_ (activities are screen presented to the user) of the application.
 Using the call graph model, instead, the input surface is defined identifying GUI inputs accepted by activities and all the other inputs accepted by _services_ (services are processes run in the background from the application).  
 Retrieved the input surface test cases are generated mixing this information with templates already existing in the system.  
@@ -99,6 +95,9 @@ With the intent of optimizing the process these generated test cases are run on 
 Finally relevant outputs are saved for further analysis under 4 different categories: _Interface_, _Interaction_, _Permissions_ and _Resources_.
 
 ![Android test generation](/img/android.png)
+
+<p align="center">Pic. 2 Android test generation</p>
+
 ## Fuzzing on embedded devices (Firmalice)
 
 Nowadays embedded devices are used in a range of applications of different subject and increase in a fast pace. As a result the security of these devices is a matter of importance and Firmalice was created to address this issue. Firmalice is binary analysis framework that supports the analysis of firmware on these devices. It tried to detect authentication bypasses which can be considered a user performing a privileged action without credentials. These bypasses are difficult to detect because the source code of the firmware is not available, it usually is in the form of a single binary image and the embedded devices frequently require their firmware to be cryptographically signed by the manufacturer. The advantages of this framework is that is does not require source code, its approach scales on multiple devices and it is not based on instrumentation and execution monitoring of firmware. Firmalice performs the following steps in order to detect vunlerabilities in firmware :
@@ -108,3 +107,12 @@ Nowadays embedded devices are used in a range of applications of different subje
 3. **Static Program Analysis**: A program dependency graph is generated during this phase. It includes a control flow between the execution states and the dependency between instructions and their correlated data.Finally an authentication slice is determined which  is a set of instructions between a proposed entry point and the privileged program point that the attacker tries to reach.
 4. **Symbolic Execution Engine**: A symbolic state is an abstract representation of the values contained in memory (e.g., variables), registers, as well as constraints on these values, for any given point of the program (i.e., each program point has an independent state). In this step Firmalice tries to define a path that will reach a privileged point from  an entry point
 5. **Authentication Bypass Check** : The privileged states provided by the previous step are checked in order to define if the user input that is required is deterministic. This means that the user input , that leads to the privileged state, can be crafted by an attacker using information from  firmware image and information that is revealed to them via device output.
+
+# References
+
+1. Godefroid, Patrice, Michael Y. Levin, and David Molnar. "SAGE: whitebox fuzzing for security testing." Queue 10.1 (2012): 20.
+2. Cadar, Cristian, and Koushik Sen. "Symbolic execution for software testing: three decades later." Communications of the ACM 56.2 (2013): 82-90.
+3. Yan Shoshitaishvili, Ruoyu Wang, Christophe Hauser, Christopher Kruegel, and Giovanni Vigna. 2015. Firmalice - Automatic Detection of Authentication Bypass Vulnerabilities in Binary Firmware. In Proceedings 2015 Network and Distributed System Security Symposium. Reston, VA: Internet Society.
+4. Oehlert, P. (2005). Violating assumptions with fuzzing. IEEE Security and Privacy, 3(2), 58-62. doi:10.1109/MSP.2005.55
+5. Bekrar, S., Bekrar, C., Groz, R., & Mounier, L. (2011). Finding software vulnerabilities by smart fuzzing. Paper presented at the Proceedings - 4th IEEE International Conference on Software Testing, Verification, and Validation, ICST 2011, 427-430. doi:10.1109/ICST.2011.48
+6. Mahmood, R., Esfahani, N., Kacem, T., Mirzaei, N., Malek, S., & Stavrou, A. (2012). A whitebox approach for automated security testing of android applications on the cloud. Paper presented at the 2012 7th International Workshop on Automation of Software Test, AST 2012 - Proceedings, 22-28. doi:10.1109/IWAST.2012.6228986
