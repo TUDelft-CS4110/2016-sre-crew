@@ -83,7 +83,7 @@ The first implementation of whitebox fuzzing was SAGE (Scalable Automated Guided
 
 ## Fuzzing on Android Devices
 Fuzzing is employed as testing technique also in mobile environment.
-Mahmood R. et al. [cite android paper] developed a fuzzing system that can be used to test Android applications.
+Mahmood R. et al. developed a fuzzing system that can be used to test Android applications.
 This can be employed for testing code under development but also already existing apps (in this case the apk needs to be decompiled in order to obtain from the java bytecode a representation of the source code).  
 As explained above, before starting with the process of fuzzing it is necessary to identify the input surface.
 To do so the _architectural model_ and the _call graph model_ [Pic. 2] come into place.
@@ -107,3 +107,12 @@ Nowadays embedded devices are used in a range of applications of different subje
 3. **Static Program Analysis**: A program dependency graph is generated during this phase. It includes a control flow between the execution states and the dependency between instructions and their correlated data.Finally an authentication slice is determined which  is a set of instructions between a proposed entry point and the privileged program point that the attacker tries to reach.
 4. **Symbolic Execution Engine**: A symbolic state is an abstract representation of the values contained in memory (e.g., variables), registers, as well as constraints on these values, for any given point of the program (i.e., each program point has an independent state). In this step Firmalice tries to define a path that will reach a privileged point from  an entry point
 5. **Authentication Bypass Check** : The privileged states provided by the previous step are checked in order to define if the user input that is required is deterministic. This means that the user input , that leads to the privileged state, can be crafted by an attacker using information from  firmware image and information that is revealed to them via device output.
+
+# References
+
+1. Godefroid, Patrice, Michael Y. Levin, and David Molnar. "SAGE: whitebox fuzzing for security testing." Queue 10.1 (2012): 20.
+2. Cadar, Cristian, and Koushik Sen. "Symbolic execution for software testing: three decades later." Communications of the ACM 56.2 (2013): 82-90.
+3. Yan Shoshitaishvili, Ruoyu Wang, Christophe Hauser, Christopher Kruegel, and Giovanni Vigna. 2015. Firmalice - Automatic Detection of Authentication Bypass Vulnerabilities in Binary Firmware. In Proceedings 2015 Network and Distributed System Security Symposium. Reston, VA: Internet Society.
+4. Oehlert, P. (2005). Violating assumptions with fuzzing. IEEE Security and Privacy, 3(2), 58-62. doi:10.1109/MSP.2005.55
+5. Bekrar, S., Bekrar, C., Groz, R., & Mounier, L. (2011). Finding software vulnerabilities by smart fuzzing. Paper presented at the Proceedings - 4th IEEE International Conference on Software Testing, Verification, and Validation, ICST 2011, 427-430. doi:10.1109/ICST.2011.48
+6. Mahmood, R., Esfahani, N., Kacem, T., Mirzaei, N., Malek, S., & Stavrou, A. (2012). A whitebox approach for automated security testing of android applications on the cloud. Paper presented at the 2012 7th International Workshop on Automation of Software Test, AST 2012 - Proceedings, 22-28. doi:10.1109/IWAST.2012.6228986
