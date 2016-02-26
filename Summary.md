@@ -64,14 +64,14 @@ In order to improve fuzzing with these techniques we need to be able to measure 
 ## Android Section
 Fuzzing is employed as testing technique also in mobile environment.
 Mahmood R. et al. [cite android paper] developed a fuzzing system that can be used to test Android applications.
-This can be employed for testing code under development but also already existing apps (in this case the apk needs to be decompiled in order to obtain from the java bytecode **the source files**).  
-As explained above before starting with the process of fuzzing it is necessary to identify the input surface.
+This can be employed for testing code under development but also already existing apps (in this case the apk needs to be decompiled in order to obtain from the java bytecode a representation of the source code).  
+As explained above, before starting with the process of fuzzing it is necessary to identify the input surface.
 To do so the _architectural model_ and the _call graph model_ [Picture 2] come into place.
 The architectural model tells the fuzzer which is the main _activity_ (activities are screen presented to the user) of the application.
-Then using the call graph model the input surface is defined identifying GUI inputs accepted by activities and all the other inputs accepted by _services_ (services are processes run in the background from the application).  
-Retrieved the input surface test cases are generated mixing this information with test cases templates already present in the system.  
-As mentioned above code coverage represents a big issue while testing, for this reason different input are generated using ad-hoc fuzzers (these generate inputs based on the specific input domain: text, numbers, etc.), and improved every round checking the current test coverage.  
-With the intent of optimizing the process these test cases generated are run on multiple parallel virtual machines on a cloud environment.   
+Using the call graph model, instead, the input surface is defined identifying GUI inputs accepted by activities and all the other inputs accepted by _services_ (services are processes run in the background from the application).  
+Retrieved the input surface test cases are generated mixing this information with templates already existing in the system.  
+As mentioned above code coverage represents a big issue while testing, for this reason different inputs are generated using ad-hoc fuzzers (these generate inputs based on the specific input domain: text, numbers, etc.), and improved every round checking the current test coverage.  
+With the intent of optimizing the process these generated test cases are run on multiple parallel virtual machines on a cloud environment.   
 Finally relevant outputs are saved for further analysis under 4 different categories: _Interface_, _Interaction_, _Permissions_ and _Resources_.
 
 ![Android test generation](/img/android.png)
