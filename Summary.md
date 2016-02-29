@@ -77,9 +77,24 @@ In order to improve fuzzing with these techniques we need to be able to measure 
 
 
 ## Sage : Whitebox Fuzzing for Security Testing
-With whitebox fuzzing the program is dynamically executed symbolically, gathering constraints on inputs from conditional branches encountered in the execution. These constraints are then negated and solved with a constraint solver, which is mapped into new inputs to execute the program. This can be very effective to verify programs and can discovers many corner cases. This process can however be imprecise due to complex program statements and incomplete due to a large amount of execution paths in a program.
-The first implementation of whitebox fuzzing was SAGE (Scalable Automated Guided Execution). SAGE implements generational search that maximizes the number of new input test generated for each symbolic execution. With a normal breadth-first or depth-first search it takes too long time if only one input is found per execution since there can be a great amount of execution paths. This is done by negating all constraints one by one on an execution path and placing them in a conjunction with the previous negations of the path. These are then solved by a constraint solver and multiple tests are created. SAGE works at the x86 binary level so it can be used on any program regardless of its source language or build process.
-	SAGE has been used extensively by Microsoft. With Windows 7, SAGE is run last to find bugs after static program analysis and blackbox fuzzing, but still managed to find one-third of all bugs in Windows 7 discovered by file fuzzing. In general, blackbox fuzzing is simple, lightweight and fast but whitebox fuzzing smarter but more complex. It is therefore good practice to first apply blackbox fuzzing to find the easier bugs and then apply whitebox fuzzing to find more bugs.
+With whitebox fuzzing the program is dynamically executed symbolically, gathering constraints on inputs from conditional branches encountered in the execution (like described in symbolic testing). 
+These constraints are then negated and solved with a constraint solver, which is mapped into new inputs to execute the program. 
+This can be very effective to verify programs and can discovers many corner cases. 
+This process can however be imprecise due to complex program statements and incomplete due to a large amount of execution paths in a program.
+
+The first implementation of whitebox fuzzing was SAGE (Scalable Automated Guided Execution). 
+To counter the problem of the huge number of execution paths, SAGE implements generational search that maximizes the number of new input test generated for each symbolic execution. 
+With a normal breadth-first or depth-first search it takes too long time if only one input is found per execution since there can be a great amount of execution paths. 
+It will therefore take less time to run SAGE since it will do fewer symbolic executions.
+This is done by negating all constraints one by one on an execution path and placing them in a conjunction with the previous negations of the path. 
+These are then solved by a constraint solver and multiple tests are created. 
+Furthermore, to counter the huge execution traces, SAGE applies many optimizations such as symbolic-expression caching, unrelated constraint elimination and local constraint caching.
+Additionally, SAGE works at the x86 binary level so it can be used on any program regardless of its source language or build process.
+
+SAGE has been used extensively by Microsoft. 
+With Windows 7, SAGE is run last to find bugs after static program analysis and blackbox fuzzing, but still managed to find one-third of all bugs in Windows 7 discovered by file fuzzing. 
+In general, blackbox fuzzing is simple, lightweight and fast but whitebox fuzzing smarter but more complex. 
+It is therefore good practice to first apply blackbox fuzzing to find the easier bugs and then apply whitebox fuzzing to find more bugs.
 
 ## Fuzzing on Android Devices
 Fuzzing is employed as testing technique also in mobile environment.
