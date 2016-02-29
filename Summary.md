@@ -4,7 +4,7 @@
 Fuzzing is an automated testing technique used to cover boundary test cases providing the application with newly generated inputs.
 Creating negative test cases (test cases that check that the system doesn't do something it is not supposed to do) is an incredibly difficult task.
 Fuzz testing helps developers in this task creating _semi-valid_ input for tests.
-These inputs are valid in the sense that they pass parser checks and they are not stopped before getting to the part of code under test, however they are malformed enough to cause unexpected behaviors in the application. 
+These inputs are valid in the sense that they pass parser checks and they are not stopped before getting to the part of code under test, however they are malformed enough to cause unexpected behaviors in the application.
 The process of fuzzing consists in 4 main steps [Pic. 1]:  
 
 1. Getting malformed data  
@@ -14,10 +14,10 @@ The process of fuzzing consists in 4 main steps [Pic. 1]:
 
 <div >
 <img align="right" style="margin-left:10px; margin-top:10px" src="/img/fuzzing flowchart.png">
-<span>asd</span>
+
 </div>
 Performing this task manually would require a lot of time.
-Being able to automate the whole process let developers and quality assurance teams take care just of the final analysis while the fuzzer perform its task hundred or even thousands of times.
+Being able to automate the whole process lets developers and quality assurance teams to take care just of the final analysis while the fuzzer performs its task hundred or even thousands of times.
 
 The main purpose of fuzzing is to test trust boundary conditions.
 These are the most relevant conditions since their locations in the code are those where vulnerabilities would result in elevation of privileges.  
@@ -61,11 +61,11 @@ Although fuzzing is a fast technique to detect error, there is room for improvem
 By analysing the binary code, potentially vulnerable sequences of code can be discovered that can lead to a fault in the execution of the program. The discovery of  these patterns will help to identify interesting points in the binary that require more focus. For example a vulnerable pattern can be a code that uses vulnerable functions such as _strcmp_.
 
 ### Taint Analysis
-Taint Analysis consists in marking data from external sources e.g. network or user input as tainted. Afterwards, during the execution of the binary these data are tracked as well as the path they follow. This will provide insight about where this data is used and if it used in dangerous  segments of the binary e.g. overwrite a return address. More specifically, the vulnerability patterns can provide information about the aforementioned dangerous segments.
+Taint Analysis consists of marking data from external sources e.g. network or user input as tainted. Afterwards, during the execution of the binary these data are tracked as well as the path they follow. This will provide insight about where this data is used and if it used in dangerous  segments of the binary e.g. overwrite a return address. More specifically, the vulnerability patterns can provide information about the aforementioned dangerous segments.
 
 ### Test Generation
 The test generation is the most important part of fuzzing since the input provided to the binary will determine whether there is a weak point or not. In order to cover as many paths as possible two different methods have been suggested.
-  * Concolic execution
+  * The aforementioned Concolic execution
   * Search algorithms  e.g. genetic algorithms
 
 
@@ -89,7 +89,7 @@ As explained above, before starting with the process of fuzzing it is necessary 
 To do so the _architectural model_ and the _call graph model_ [Pic. 2] come into place.
 The architectural model tells the fuzzer which is the main _activity_ (activities are screen presented to the user) of the application.
 Using the call graph model, instead, the input surface is defined identifying GUI inputs accepted by activities and all the other inputs accepted by _services_ (services are processes run in the background from the application).  
-Retrieved the input surface test cases are generated mixing this information with templates already existing in the system.  
+Retrieved the input surface, test cases are generated mixing this information with templates already existing in the system.  
 As mentioned above code coverage represents a big issue while testing, for this reason different inputs are generated using ad-hoc fuzzers (these generate inputs based on the specific input domain: text, numbers, etc.), and improved every round checking the current test coverage.  
 With the intent of optimizing the process these generated test cases are run on multiple parallel virtual machines on a cloud environment.   
 Finally relevant outputs are saved for further analysis under 4 different categories: _Interface_, _Interaction_, _Permissions_ and _Resources_.
@@ -100,10 +100,10 @@ Finally relevant outputs are saved for further analysis under 4 different catego
 
 ## Fuzzing on embedded devices (Firmalice)
 
-Nowadays embedded devices are used in a range of applications of different subject and increase in a fast pace. As a result the security of these devices is a matter of importance and Firmalice was created to address this issue. Firmalice is binary analysis framework that supports the analysis of firmware on these devices. It tried to detect authentication bypasses which can be considered a user performing a privileged action without credentials. These bypasses are difficult to detect because the source code of the firmware is not available, it usually is in the form of a single binary image and the embedded devices frequently require their firmware to be cryptographically signed by the manufacturer. The advantages of this framework is that is does not require source code, its approach scales on multiple devices and it is not based on instrumentation and execution monitoring of firmware. Firmalice performs the following steps in order to detect vunlerabilities in firmware :
+Nowadays embedded devices are used in a range of applications of different subject and increase in a fast pace. As a result the security of these devices is a matter of importance and Firmalice was created to address this issue. Firmalice is a binary analysis framework that supports the analysis of firmware on these devices. It tried to detect authentication bypasses which can be considered as a user performing a privileged action without credentials. These bypasses are difficult to detect because the source code of the firmware is not available, it usually is in the form of a single binary image and the embedded devices frequently require their firmware to be cryptographically signed by the manufacturer. The advantages of this framework is that is does not require source code, its approach scales on multiple devices and it is not based on  the instrumentation and execution monitoring of the firmware. Firmalice performs the following steps in order to detect vulnerabilities in firmware :
 
 1. **Firmware loading**: Disassemble binary file and detect entry points
-2. **Security policies**: A security policy will be provided and analysed to detect privileged access points
+2. **Security policies**: A security policy will be provided and analyzed to detect privileged access points
 3. **Static Program Analysis**: A program dependency graph is generated during this phase. It includes a control flow between the execution states and the dependency between instructions and their correlated data.Finally an authentication slice is determined which  is a set of instructions between a proposed entry point and the privileged program point that the attacker tries to reach.
 4. **Symbolic Execution Engine**: A symbolic state is an abstract representation of the values contained in memory (e.g., variables), registers, as well as constraints on these values, for any given point of the program (i.e., each program point has an independent state). In this step Firmalice tries to define a path that will reach a privileged point from  an entry point
 5. **Authentication Bypass Check** : The privileged states provided by the previous step are checked in order to define if the user input that is required is deterministic. This means that the user input , that leads to the privileged state, can be crafted by an attacker using information from  firmware image and information that is revealed to them via device output.
