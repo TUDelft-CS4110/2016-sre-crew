@@ -1,4 +1,4 @@
-# Fuzzing Tools
+# Android Fuzzing Tools
 
 * **Intent Fuzzer** (ncc group)  
 Intent Fuzzer is a tool that can be used on any device using the Google Android operating system (OS). Intent Fuzzer is exactly what is seems, which is a fuzzer. It often finds bugs that cause the system to crash or performance issues on the device. The tool can either fuzz a single component or all components. It works well on Broadcast receivers, and average on Services. For Activities, only single Activities can be fuzzed, not all them. Instrumentations can also be started using this interface, and content providers are listed, but are not an Intent based IPC mechanism.  
@@ -16,7 +16,7 @@ The main idea behind this project is to create corrupt but structurally valid me
 https://github.com/fuzzing/MFFA
 
 
-# General Tools
+# General Fuzzing Tools
 
 * **jFuzz**  
 http://people.csail.mit.edu/akiezun/jfuzz/documentation.html
@@ -29,3 +29,9 @@ http://angr.io/
 
 * **KLEE**  
 http://klee.github.io/
+
+# Questions
+
+* Are there any whitebox Android tools? we don't find any
+
+* Our applications and programs are probably too simple for fuzzing since most of the times it requires either pdf/image input or protocol stuff.
