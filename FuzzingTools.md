@@ -1,4 +1,4 @@
-# Fuzzing Tools
+# Android Fuzzing Tools
 
 * **Intent Fuzzer** (ncc group)  
 Intent Fuzzer is a tool that can be used on any device using the Google Android operating system (OS). Intent Fuzzer is exactly what is seems, which is a fuzzer. It often finds bugs that cause the system to crash or performance issues on the device. The tool can either fuzz a single component or all components. It works well on Broadcast receivers, and average on Services. For Activities, only single Activities can be fuzzed, not all them. Instrumentations can also be started using this interface, and content providers are listed, but are not an Intent based IPC mechanism.  
@@ -16,7 +16,7 @@ The main idea behind this project is to create corrupt but structurally valid me
 https://github.com/fuzzing/MFFA
 
 
-# General Tools
+# General Fuzzing Tools
 
 * **jFuzz**  
 http://people.csail.mit.edu/akiezun/jfuzz/documentation.html
@@ -28,11 +28,19 @@ http://people.csail.mit.edu/akiezun/jfuzz/documentation.html
   2. Constraint Solving: Once the concolic execution has completed, jFuzz systematically negates the constraints encountered on the executed path. jFuzz conjoins the corresponding path condition with the negated constraint, to obtain a new path condition query for the solver. The solution is in terms of input bytes, i.e., describes the values of the input bytes.
   3. Fuzzing: For each solution, jFuzz changes the corresponding input bytes of the initial seed input to obtain a new modified input for the program under test.
 
+
 * **American Fuzzy Lop**  
 https://fuzzing-project.org/tutorial3.html
 
+  American fuzzy lop is a security-oriented fuzzer that employs a novel type of compile-time instrumentation and genetic algorithms to automatically discover clean, interesting test cases that trigger new internal states in the targeted binary. This substantially improves the functional coverage for the fuzzed code. The compact synthesized corpora produced by the tool are also useful for seeding other, more labor- or resource-intensive testing regimes down the road.
+
+
+
 * **angr**  
 http://angr.io/
+angr is a framework for analyzing binaries. It focuses on both static and dynamic symbolic ("concolic") analysis, making it applicable to a variety of tasks.
+
+
 
 * **KLEE**  
 http://klee.github.io/
@@ -50,3 +58,9 @@ http://antiparser.sourceforge.net/
 https://www.cert.org/vulnerability-analysis/tools/bff.cfm?
 
   The CERT Basic Fuzzing Framework (BFF) is a software testing tool that finds defects in applications that run on the Linux and Mac OS X platforms. BFF performs mutational fuzzing on software that consumes file input. (Mutational fuzzing is the act of taking well-formed input data and corrupting it in various ways, looking for cases that cause crashes.) The BFF automatically collects test cases that cause software to crash in unique ways, as well as debugging information associated with the crashes. The goal of BFF is to minimize the effort required for software vendors and security researchers to efficiently discover and analyze security vulnerabilities found via fuzzing.
+
+# Questions
+
+* Are there any whitebox Android tools? we don't find any
+
+* Our applications and programs are probably too simple for fuzzing since most of the times it requires either pdf/image input or protocol stuff.
