@@ -21,6 +21,13 @@ https://github.com/fuzzing/MFFA
 * **jFuzz**  
 http://people.csail.mit.edu/akiezun/jfuzz/documentation.html
 
+  jFuzz architecture. Given the program under test and seed inputs, jFuzz generates new inputs by modifying (fuzzing) the seed inputs so that each new input executes a unique control-flow path. jFuzz is built as an extension to NASA Java PathFinder. Java PathFinder is an explicit state software model checker for Java bytecode, that also provides hooks for a variety of analysis techniques. The figure above illustrates the architecture of jFuzz.
+
+  jFuzz works in three steps:
+  1. Concolic Execution: jFuzz executes the subject program using concolic execution in Java PathFinder on the seed input, and collects the path condition. Each byte in the seed inputs is marked symbolic.
+  2. Constraint Solving: Once the concolic execution has completed, jFuzz systematically negates the constraints encountered on the executed path. jFuzz conjoins the corresponding path condition with the negated constraint, to obtain a new path condition query for the solver. The solution is in terms of input bytes, i.e., describes the values of the input bytes.
+  3. Fuzzing: For each solution, jFuzz changes the corresponding input bytes of the initial seed input to obtain a new modified input for the program under test.
+
 * **American Fuzzy Lop**  
 https://fuzzing-project.org/tutorial3.html
 
