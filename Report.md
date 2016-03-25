@@ -2,6 +2,9 @@
 
 ## Introduction
 
+* Fuzzing task, turned into fuzzing+state machine because of tool that was made in TU Delft for Android
+* The original purpose of the tool
+
 ### Fuzzing
 
 * What is fuzzing and what is its benefits
@@ -12,9 +15,18 @@
 
 ## Tools
 
-### bunq app
 * What already existed
-* About the bunq app and how it's different
+
+### fuzzer
+
+* What is does, its capabilities
+* How it's implemented (short)
+* Our additions
+
+### fsm-learner
+
+* What is does, its capabilities
+* How it's implemented (short)
 
 ### Plan
 
@@ -41,5 +53,7 @@
 
 ### Discussions (maybe)
 * Summerize what we were able to do and what not
+
+## Future Work
 
 ## Conclusion
