@@ -57,7 +57,8 @@ public String getClassName() throws UiObjectNotFoundException {
   String class_name = device.getCurrentPackageName();
   return class_name;
 }
-    ````
+````
+
 2. **clickSpecific** : It is provided with coordinates in the format of `coordinate_X,coordinate_Y` and emulates a click on that position. The return string informs us if the action was successful or not.
 
 ````java
@@ -68,8 +69,8 @@ public String clickSpecific(String id) throws UiObjectNotFoundException{
   if (device.click(x,y)) return "successful click";
   else return "problem with click";
 }
-
 ````
+
 Based on these two new functionalities, we introduced a XML template file with actions that automate the process of fuzzing any android application. For the template, the user needs to put the target application on the top left corner of the android virtual device and the devices size should be that of a normal  phone and not tablet. The action set consists of three sub action sets that are the three steps in the fuzzing process which we can see below:
 
 ![XML Template](img/xml_file.png)
