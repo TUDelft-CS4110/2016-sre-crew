@@ -88,8 +88,40 @@ At the end of the fuzzing process, the user can analyze the output and compare t
 
 ### fsm-learner
 
-* What is does, its capabilities
-* How it's implemented (short)
+The purpose of this tool is this of translating an application into a finite state machine.  
+A finite state automaton can be represented by the quintuple `(𝚺, S, S0, 𝛅, F)`.  
+* **𝚺** is the alphabet that the FSM accepts. This considered in the case of an android application is the possible actions available in every specific screen of the application. These can be an `EditText`, a `CheckBox`, a `Button` and all the possible user inputs.
+* **S** represents a set of states which needs to be _finite_ and _non-empty_.
+* **S<sub>0</sub>** is the start state of the application
+* **𝛅** is the transition function (`S x 𝚺 -> S`). This represent the transition from one state to the other accepting a specific element of the alphabet.
+* **F** is a finite set of final states (`F ⊆ S`). This can be empty if the system doesn't have any final state.
+
+In order to retrieve a finite state machine from the application all the elements of this quintuple needs to be defined. And this is performed in 2 main steps.
+
+##### Defining the alphabet 𝚺
+The alphabet is retrieved dumping the screens of the application.
+Every screen contains UI elements that allows different actions.
+For this reason the (`adb shell uiautomator dump`) functionality is used.
+Using this command an XML file containing a dump of the screen is obtained and from this file all the possible actions are extracted and put into the alphabet.
+An example of these actions is:  
+`push%//android.widget.LinearLayout[1] ... [@index='0' and @resource-id='' and contains(@text, '') and @content-desc='']/android.widget.Button[1][@index='3' and @resource-id='com.example.xeus.udpclient:id/register_button' and contains(@text, 'Connect/Register to Server') and @content-desc='']#696#144`  
+which represent the action of pushing the _Register to server_ button in Figure [**REF TO FIGURE**].  
+The tool provide two functionalities for this purpose:
+1. The first one `alphabet:create` helps the user dumping the screens of the application.
+2. The second one `alphabet:compose` merge all the actions obtained from the screen dumps and compose the alphabet of the finite state machine.
+
+![Alphabet](/img/main_screen.png)
+
+##### Defining the states
+After defining the alphabet **𝚺** the learning process starts.
+This tries to perform all the possible actions listed in the alphabet starting from an initial state **_S<sub>0</sub>_**. When one action succeeds a new state is spawn.
+And a transition function **_𝛅_** that from a state **_S<sub>i</sub>_** accepting an element of **𝚺** brings the system to a state **_S<sub>j</sub>_**.
+Using this tool the following learning algorithm are available: _L*_, _TTT_, _DHC_, _Maler/Pnueli_, _Kearns/Varizani_.
+
+#### Problems
+
+Small description of problems we bumped into during the usage of the tool.
+
 
 ### Plan
 
