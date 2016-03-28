@@ -136,10 +136,11 @@ The UDPClient application is part of the Hacking Lab course assignment of one of
 The application does not include many fuzzing points from the perspective that the user cannot insert many different inputs. However, the network orientaoltion of the application exposes different cases where connection variables could have not be initiated properly. Therefore, in our action xml file we included click actions of buttons with a random chance. After running the fuzzing tool for a few hours, we discovered two weak points that caused the application to crash.
 
 1. If a user tried to get the list of registered peers without having first connected to the server, the application did not handle correctly the `null` reference and crashed. The existing code did the following check
-````java
-if ( !(MyRouter == null) && MyRouter.registered)
-````
-However, the second condition was also evaluated even though the `MyRouter` variable was null. This caused the application to crash. (**FIRST FIGURE REF**)
+  ````java
+  if ( !(MyRouter == null) && MyRouter.registered)
+  ````
+  However, the second condition was also evaluated even though the `MyRouter` variable was null. This caused the application to crash. (**FIRST FIGURE REF**)
+
 2. The second weak point that was discovered with the fuzzing tool was a set of actions that ignored some UI elements that are preventing actual users from performing actions. While the application is retrieving from the server the list of users there is a `ProgessDialog` to prevent the user from clicking something. Normally users do not ignore this message but the fuzzing tool kept emulating actions. When a click on the `See Relays` button was emulated but the server had not responded yet with the actual list this caused a `null` reference and crashed the application. In the following picture we can see the `ProgressDialog` and the `See Relays` button in the background. (**SECONG FIGURE REF**)
 
 ![Fuzzing case](img/udpclientFuzzing.png) ![Fuzzing case 2](img/udpclientFuzzing2.png)
