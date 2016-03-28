@@ -52,24 +52,38 @@ We added two below function calls inside the `DriveUiAutomator.java` which expos
 
 1. **getClassName** : returns the name of the current package. This value will help us determine whether the application has crashed or the current package is the target application. If the application crashes then the result is the string `android`.
 
-````java
-public String getClassName() throws UiObjectNotFoundException {
-  String class_name = device.getCurrentPackageName();
-  return class_name;
-}
-````
+  ````java
+  public String getClassName() throws UiObjectNotFoundException {
+    String class_name = device.getCurrentPackageName();
+    return class_name;
+  }
+  ````
 
 2. **clickSpecific** : It is provided with coordinates in the format of `coordinate_X,coordinate_Y` and emulates a click on that position. The return string informs us if the action was successful or not.
 
-````java
-public String clickSpecific(String id) throws UiObjectNotFoundException{
-  String[] splitCoordinates = id.split(",");
-  Integer x = Integer.parseInt(splitCoordinates[0]);
-  Integer y = Integer.parseInt(splitCoordinates[1]);
-  if (device.click(x,y)) return "successful click";
-  else return "problem with click";
-}
-````
+  ````java
+  public String clickSpecific(String id) throws UiObjectNotFoundException{
+    String[] splitCoordinates = id.split(",");
+    Integer x = Integer.parseInt(splitCoordinates[0]);
+    Integer y = Integer.parseInt(splitCoordinates[1]);
+    if (device.click(x,y)) return "successful click";
+    else return "problem with click";
+  }
+  ````
+  In order to find the X,Y coordinates on an android application we created and added to each android  `Activity` the following code fragment.
+  ````java
+  @Override
+  public boolean onTouchEvent(MotionEvent event) {
+      int x = (int)event.getX();
+      int y = (int)event.getY();
+      switch (event.getAction()) {
+          case MotionEvent.ACTION_MOVE:
+              Log.i("coordinates","X:"+x+"   Y:"+y);
+
+      }
+      return false;
+  }
+  ````
 
 Based on these two new functionalities, we introduced a XML template file with actions that automate the process of fuzzing any android application. For the template, the user needs to put the target application on the top left corner of the android virtual device and the devices size should be that of a normal  phone and not tablet. The action set consists of three sub action sets that are the three steps in the fuzzing process which we can see below:
 
@@ -95,22 +109,40 @@ At the end of the fuzzing process, the user can analyze the output and compare t
 
 * What we do with the tool
 
-## Sage Math
+## SageMath
 
-* About Sage
+SageMath is a free open-source mathematics software system licensed under the GPL. It builds on top of many existing open-source packages: NumPy, SciPy, matplotlib, Sympy, Maxima, GAP, FLINT, R and many more. Moreover, SageMath won the  first prize in the scientific software division of Les Trophées du Libre, an international competition for free software in 2007. In 2012 it was one of the projects selected for the Google Summer of Code. These reasons led us to choose this application and try to fuzz it.
 
-### Sage Fuzzing
+### SageMath Fuzzing
+With the SageMath application we stumbled upon problems while using the fuzzing tool, as we mentioned before. After analyzing the applications architecture and implementation, we discovered some weak points that could be exploited with fuzzing. These weak points as well as their limitations led us to extend the functionalities of the fuzzing tool.
+
+1. The application communicated with a server to send the math equations that were gonna be executed and received the results. This connection was re-established every time with the click of one button. Therefore, we tried to exhaust the application resources for network capacity and crash the application. Although we succeeded when we were manually performing the clicks, with the use of the fuzzing tool the click emulation was too slow to be successful.
+2. The application was using a SQLite database to store strings that were inserted by the user. The problem in this case was that SageMath was using a `Dialogue` layout to insert the new user string. Therefore, the `OK` button could not be retrieved through the XML layout file.   We used the fuzzing tool to insert random and lengthy text into the user input field but then manually clicked the `OK` button. This had as a result the crashing of the application when a lengthy text was inserted because it could not be saved into the database. As a result when it was clicked afterwards the reference was `null` and led to the applications crash.
+3. One extra functionality of the application was to let the user insert any code he wanted which was executed from the server. The weak point in this case was specific input that caused the server to answer with a `null`. When this occurred the android application crashed during the parsing of the `null` object with the `Gson` library. We believe that although we discovered this kind of weakness, it is not part of the fuzzing process since the input has to be specifically defined but it is worth mentioning.
+
+
+![SageMath Fuzzing 1](img/socketFuzzing.png)![SageMath Fuzzing 2](img/groupNameFuzzing.png)
 
 ### Sage State Machine
 
-### Discussions (maybe)
+### Discussions (maybe) (I say we include the discussion in each section of the app)
 * Summerize what we were able to do and what not
 
 ## UDPClient
 
-* About the app
+The UDPClient application is part of the Hacking Lab course assignment of one of our team members. This application is used for peer to peer communication between devices that have the application installed. Every peer first registers to a server and then retrieves information about other registered peers. With the use of the new added functionalities on the fuzzing tool we tried to fuzz it.
 
 ### UDPClient Fuzzing
+The application does not include many fuzzing points from the perspective that the user cannot insert many different inputs. However, the network orientaoltion of the application exposes different cases where connection variables could have not be initiated properly. Therefore, in our action xml file we included click actions of buttons with a random chance. After running the fuzzing tool for a few hours, we discovered two weak points that caused the application to crash.
+
+1. If a user tried to get the list of registered peers without having first connected to the server, the application did not handle correctly the `null` reference and crashed. The existing code did the following check
+````java
+if ( !(MyRouter == null) && MyRouter.registered)
+````
+However, the second condition was also evaluated even though the `MyRouter` variable was null. This caused the application to crash. (**FIRST FIGURE REF**)
+2. The second weak point that was discovered with the fuzzing tool was a set of actions that ignored some UI elements that are preventing actual users from performing actions. While the application is retrieving from the server the list of users there is a `ProgessDialog` to prevent the user from clicking something. Normally users do not ignore this message but the fuzzing tool kept emulating actions. When a click on the `See Relays` button was emulated but the server had not responded yet with the actual list this caused a `null` reference and crashed the application. In the following picture we can see the `ProgressDialog` and the `See Relays` button in the background. (**SECONG FIGURE REF**)
+
+![Fuzzing case](img/udpclientFuzzing.png) ![Fuzzing case 2](img/udpclientFuzzing2.png)
 
 ### UDPClient State Machine
 
