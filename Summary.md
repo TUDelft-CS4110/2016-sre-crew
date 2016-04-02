@@ -37,7 +37,7 @@ On the other hand sometimes trying to mutate data that has to follow strict prot
 ## Symbolic Testing
 With black box fuzzing it can be difficult to get good code coverage since it is sometimes very unlikely to reach a certain statement of a program without looking at the source code. If the source code of a program is known it is possible to utilize that knowledge with symbolic execution.
 
-The goal of symbolic execution is to explore as many program paths as possible in a given amount of time and for each path generate a set of concrete input values exercising that path. It should also check for various kinds of errors like assertion violations, uncaught exceptions, security vulnerabilities and memory corruption. The idea behind symbolic execution is to use symbolic values instead of concrete data values as input, which results in making output values a function of the symbolic input values, and to represent the values of program variables as symbolic expressions over the symbolic input values. During symbolic execution a state σ (sigma) is maintained which maps variables to symbolic expression. A path constraint, PC, is also maintained which is a quantifier-free first-order formula over symbolic expressions. The state σ is initialized to an empty map and is updated at every assignment to contain something like {z -> 2y}. PC is initialized to true, updated with every conditional statement and in the end it is solved with a constraint solver to generate a concrete input for that execution path. At every update, PC becomes PC ^ σ(e) for the “then” branch and a new path constraint PC’ is created which is initialized to PC ^ ¬σ(e). If PC or PC’ are satisfiable for some assignment of concrete to symbolic values, symbolic execution continues for PC in the “then” branch or is created for PC’ for the “else” branch. Symbolic execution terminates if any of PC or PC’ is not satisfiable. If the symbolic execution hits an exit statement or an error, the execution is terminated and a constraint solver is used to form an input from the PC. 
+The goal of symbolic execution is to explore as many program paths as possible in a given amount of time and for each path generate a set of concrete input values exercising that path. It should also check for various kinds of errors like assertion violations, uncaught exceptions, security vulnerabilities and memory corruption. The idea behind symbolic execution is to use symbolic values instead of concrete data values as input, which results in making output values a function of the symbolic input values, and to represent the values of program variables as symbolic expressions over the symbolic input values. During symbolic execution a state σ (sigma) is maintained which maps variables to symbolic expression. A path constraint, PC, is also maintained which is a quantifier-free first-order formula over symbolic expressions. The state σ is initialized to an empty map and is updated at every assignment to contain something like {z -> 2y}. PC is initialized to true, updated with every conditional statement and in the end it is solved with a constraint solver to generate a concrete input for that execution path. At every update, PC becomes PC ^ σ(e) for the “then” branch and a new path constraint PC’ is created which is initialized to PC ^ ¬σ(e). If PC or PC’ are satisfiable for some assignment of concrete to symbolic values, symbolic execution continues for PC in the “then” branch or is created for PC’ for the “else” branch. Symbolic execution terminates if any of PC or PC’ is not satisfiable. If the symbolic execution hits an exit statement or an error, the execution is terminated and a constraint solver is used to form an input from the PC.
 
 The main disadvantage to classical symbolic execution is that it cannot create an input if the PC along an execution path contains formulas that can not be efficiently solved with a constraint solver. For example, if a program contains the statement x = twice(y), where twice is an uninterpreted function in a library, the constraint solver can not solve it since they don’t know how to manipulate x. In this case, the symbolic execution will fail to generate any input.
 There are two modern solutions to these problems which are **Concolic Testing** and **Execution-Generated Testing** (EGT). Their technique is to mix concrete and symbolic execution.
@@ -81,23 +81,23 @@ In order to improve fuzzing with these techniques we need to be able to measure 
 
 
 ## Sage : Whitebox Fuzzing for Security Testing
-With whitebox fuzzing the program is dynamically executed symbolically, gathering constraints on inputs from conditional branches encountered in the execution (like described in symbolic testing). 
-These constraints are then negated and solved with a constraint solver, which is mapped into new inputs to execute the program. 
-This can be very effective to verify programs and can discovers many corner cases. 
+With whitebox fuzzing the program is dynamically executed symbolically, gathering constraints on inputs from conditional branches encountered in the execution (like described in symbolic testing).
+These constraints are then negated and solved with a constraint solver, which is mapped into new inputs to execute the program.
+This can be very effective to verify programs and can discovers many corner cases.
 This process can however be imprecise due to complex program statements and incomplete due to a large amount of execution paths in a program.
 
-The first implementation of whitebox fuzzing was SAGE (Scalable Automated Guided Execution). 
-To counter the problem of the huge number of execution paths, SAGE implements generational search that maximizes the number of new input test generated for each symbolic execution. 
-With a normal breadth-first or depth-first search it takes too long time if only one input is found per execution since there can be a great amount of execution paths. 
+The first implementation of whitebox fuzzing was SAGE (Scalable Automated Guided Execution).
+To counter the problem of the huge number of execution paths, SAGE implements generational search that maximizes the number of new input test generated for each symbolic execution.
+With a normal breadth-first or depth-first search it takes too long time if only one input is found per execution since there can be a great amount of execution paths.
 It will therefore take less time to run SAGE since it will do fewer symbolic executions.
-This is done by negating all constraints one by one on an execution path and placing them in a conjunction with the previous negations of the path. 
-These are then solved by a constraint solver and multiple tests are created. 
+This is done by negating all constraints one by one on an execution path and placing them in a conjunction with the previous negations of the path.
+These are then solved by a constraint solver and multiple tests are created.
 Furthermore, to counter the huge execution traces, SAGE applies many optimizations such as symbolic-expression caching, unrelated constraint elimination and local constraint caching.
 Additionally, SAGE works at the x86 binary level so it can be used on any program regardless of its source language or build process.
 
-SAGE has been used extensively by Microsoft. 
-With Windows 7, SAGE is run last to find bugs after static program analysis and blackbox fuzzing, but still managed to find one-third of all bugs in Windows 7 discovered by file fuzzing. 
-In general, blackbox fuzzing is simple, lightweight and fast but whitebox fuzzing smarter but more complex. 
+SAGE has been used extensively by Microsoft.
+With Windows 7, SAGE is run last to find bugs after static program analysis and blackbox fuzzing, but still managed to find one-third of all bugs in Windows 7 discovered by file fuzzing.
+In general, blackbox fuzzing is simple, lightweight and fast but whitebox fuzzing smarter but more complex.
 It is therefore good practice to first apply blackbox fuzzing to find the easier bugs and then apply whitebox fuzzing to find more bugs.
 
 ## Fuzzing on Android Devices
