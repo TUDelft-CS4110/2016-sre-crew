@@ -227,6 +227,16 @@ The application does not include many fuzzing points from the perspective that t
 * The alphabet we used
 * The different tries with restart
 
+The following machine state that was created represents correctly the behavior of the UDPClient application.  
+* _State 0_ represents the first  screen of the aplication. The possible actions on this screen are either the 'Connect/Register to Server' or 'Find Relays' button. If the latter is pressed then the user cannot proceed since he first needs to connect to the server. We can see this behavior with the find_relays arrow that stays at _State 0_. On the other hand if the user clicks the first button he moves to _State 4_.
+* _State 1_ represents the state where all actions arrive if the corresponding alphabet element is not found.
+* _State 2_ represents the state where the user can only press the Relaybutton which as we can see leads to another state.
+* _State 3_ represents the final screen of the application. In this case the only part of the alphabet that is available is the RelayListView which when clicked remains in the same page. As we can see in the state machine this is represented correctly with the arrow that leads back to _State 3_.
+*  _State 4_ represents again the first screen but this time the user has registered. From that state if the user clicks the register button again he stays in the same state. If he presses the Find Relays button he can now proceed to _State 2_.
+
+
+![Machine State](img/UDP_state_machine.png)
+
 ### Discussions (maybe)
 * Summerize what we were able to do and what not
 
