@@ -106,8 +106,39 @@ Based on these two new functionalities, we introduced a XML template file with a
 
 ### fsm-learner
 
-* What is does, its capabilities
-* How it's implemented (short)
+The purpose of this tool is this of translating an application into a finite state machine.  
+A finite state automaton can be represented by the quintuple `(𝚺, S, S0, 𝛅, F)`.  
+* **𝚺** is the alphabet that the FSM accepts.
+This considered in the case of an android application is the list of possible actions available in every specific screen of the application (`EditText`,`CheckBox`, `Button`, etc.).
+* **S** represents a set of states which needs to be _finite_ and _non-empty_.
+* **S<sub>0</sub>** is the start state of the application
+* **𝛅** is the transition function (`S x 𝚺 -> S`).
+This represent the transition from one state to the other accepting a specific element of the alphabet.
+* **F** is a finite set of final states (`F ⊆ S`). This can be empty if the system doesn't have any final state.
+
+In order to retrieve a finite state machine from the application all the elements of this quintuple needs to be defined. And this is performed in 2 main steps.
+
+##### Defining the alphabet 𝚺
+The alphabet is retrieved dumping the screens of the application.
+Every screen contains UI elements that allow different actions.
+For this reason the `adb shell uiautomator dump` functionality is used.
+Using this command an XML file containing a dump of the screen is obtained and from this file all the possible actions are extracted and put into the alphabet.
+An example of these actions is:  
+`push%//android.widget.FrameLayout[1][@index='0' and @resource-id='' and contains(@text, '') and @content-desc='']/android.widget.ListView[1][@index='0' and @resource-id='' and contains(@text, '') and @content-desc='']#125#65`  
+which represent the action of pushing an element contained in a `ListView`.  
+The tool provide two functionalities for this purpose:
+1. The first one `alphabet:create` helps the user dumping the screens of the application.
+2. The second one `alphabet:compose` merge all the actions obtained from the screen dumps and compose the alphabet of the finite state machine.
+
+##### Defining the states -- TO BE CHANGED A BIT
+After defining the alphabet **𝚺** the learning process starts.
+This tries to perform all the possible actions listed in the alphabet starting from an initial state **_S<sub>0</sub>_**. When one action succeeds a transition function **_𝛅_** is defined. This, accepting an element of **𝚺**, brings the system from a state **_S<sub>i</sub>_** to a state **_S<sub>j</sub>_** (`i` and `j` can be the same value).
+Using this tool the following learning algorithm are available: _L*_, _TTT_, _DHC_, _Maler/Pnueli_, _Kearns/Varizani_.
+
+#### Problems
+
+The tool had some  
+
 
 ### Plan
 
@@ -140,10 +171,11 @@ The UDPClient application is part of the Hacking Lab course assignment of one of
 The application does not include many fuzzing points from the perspective that the user cannot insert many different inputs. However, the network architecture of the application exposes different cases where connection variables could have not be initiated properly. Therefore, in our action XML file we included random click actions of buttons with a random chance as well as various text inputs. After running the fuzzing tool for a few hours, we discovered two weak points that caused the application to crash.
 
 1. If a user tried to get the list of registered peers without having first connected to the server, the application did not handle correctly the `null` reference and crashed. The existing code did the following check
-````java
-if ( !(MyRouter == null) && MyRouter.registered)
-````
-However, the second condition was also evaluated even though the `MyRouter` variable was null. This caused the application to crash. (**FIRST FIGURE REF**)
+  ````java
+  if ( !(MyRouter == null) && MyRouter.registered)
+  ````
+  However, the second condition was also evaluated even though the `MyRouter` variable was null. This caused the application to crash. (**FIRST FIGURE REF**)
+
 2. The second weak point that was discovered with the fuzzing tool was a set of actions that ignored some UI elements that are preventing actual users from performing actions. While the application is retrieving from the server the list of users there is a `ProgessDialog` to prevent the user from clicking something. Normally users do not ignore this message but the fuzzing tool kept emulating actions. When a click on the `See Relays` button was emulated but the server had not responded yet with the actual list this caused a `null` reference and crashed the application. In the following picture we can see the `ProgressDialog` and the `See Relays` button in the background. (**SECONG FIGURE REF**)
 
 3. The available text input for a user are two text fields that correspond to a server IP and Port. After fuzzing with random inputs there was no successful input that crashed this application. As a result from the perspective of text fuzzing, there are no weak points.
