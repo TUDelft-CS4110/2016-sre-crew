@@ -132,10 +132,19 @@ The tool provide two functionalities for this purpose:
 1. The first one `alphabet:create` helps the user dumping the screens of the application.
 2. The second one `alphabet:compose` merge all the actions obtained from the screen dumps and compose the alphabet of the finite state machine.
 
-##### Defining the states -- TO BE CHANGED A BIT
+##### Defining the states
 After defining the alphabet **𝚺** the learning process starts.
-This tries to perform all the possible actions listed in the alphabet starting from an initial state **_S<sub>0</sub>_**. When one action succeeds a transition function **_𝛅_** is defined. This, accepting an element of **𝚺**, brings the system from a state **_S<sub>i</sub>_** to a state **_S<sub>j</sub>_** (`i` and `j` can be the same value).
-Using this tool the following learning algorithm are available: _L*_, _TTT_, _DHC_, _Maler/Pnueli_, _Kearns/Varizani_.
+The tool is split in 2 parts:
+* **Teacher:** The teacher executes the action that is instructed to perform.
+These actions are sent to the device using [appium](http://appium.io) which makes possible to perform automated application on the device.
+* **Learner:** The learner executes the learning algorithm trying to create the state machine.
+It is in charge of providing the teacher with the action that wants to execute.
+After the action is executed the learner stores the result provided  by the teacher to refine its knowledge about the system.
+These answers can be `0-OK` or `1-NOTFOUND` depending on the fact that the system is able to perform or not such an action from that specific condition.
+When it considers to have an accurate representation of the system under learning (_SUL_) tries to test this representation sending the generated state machine to the teacher so that it can test it with different _counterexamples_.
+If the tests succeed the learning procedure stops and provides the user with a `dot` graph of the system. Otherwise it starts a new learning round improved with what went wrong in the last round.
+
+Afterwards, when the automata is generated it contains the different states that depict the system along with a sink state where all the action that are not accepted from a state (all those marked as `1-NOTFOUND`) go. 
 
 #### Reset
 The bunq tool offers possibilities to restart the execution of actions after executing some specified actions.
