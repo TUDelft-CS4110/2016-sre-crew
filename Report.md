@@ -26,7 +26,7 @@ The progress of using the tool will be described, the results from using it alon
 
 Finite State Machines (FSM) can be used to examine and test software implementations.
 Analyzing FSM's can provide information about possible bugs and deadlocks and can show if all possible paths in the software are correct and secure [REFERENCE SLIDES].
-It could happen that transitions or states are identified that are not supposed to be there or when entering a certain state, it is not possible to get to another state from there....
+It could happen that transitions or states are identified that are not supposed to be there or when entering a certain state, it is not possible to get to another state from there.... NOT FINISHED
 
 ## Tools
 
@@ -43,7 +43,7 @@ In order to fuzz an android application, we need to be able to emulate random ac
 In the following figure we have the overview of how the tool works:
 ![Fuzzing Tool](img/Fuzzing-tool.png)
 
-#### Problems
+#### Working with the tool
 In our analysis with the tool, we found some limitations with the existing implementation and added our own functionalities to extend the capabilities of the tool. Below we describe these limitations and what we suggest to improve the tool.  
 First of all, an action can be applied only to an element that exists as part of the android `layout.xml`. Modern applications tend to use less and less pre-defined XML elements in their activities and instead dynamically generate them through the code. Elements like `Dialogues` and their "Cancel, OK" buttons or `ActionBarFragment` do not include XML elements for their UI components. As a result the tool in its current state cannot reach all the possible states of an application. Furthermore, the socket communication between the client and server causes a delay when applying the emulated action on the running application. This can limit the fuzzing on the perspective of exhausting memory or network resources. Finally when the fuzzer successfully crashes the running application there doesn't seem to be a clear way to identify this result on the Pc-Client. Because of this problem the fuzzing process we described before cannot be repeated automatically.
 
@@ -133,18 +133,55 @@ After defining the alphabet **𝚺** the learning process starts.
 This tries to perform all the possible actions listed in the alphabet starting from an initial state **_S<sub>0</sub>_**. When one action succeeds a transition function **_𝛅_** is defined. This, accepting an element of **𝚺**, brings the system from a state **_S<sub>i</sub>_** to a state **_S<sub>j</sub>_** (`i` and `j` can be the same value).
 Using this tool the following learning algorithm are available: _L*_, _TTT_, _DHC_, _Maler/Pnueli_, _Kearns/Varizani_.
 
-#### Problems
+#### Reset
+The bunq tool offers possibilities to restart the execution of actions after executing some specified actions.
+This can be done in three possible ways: hard reset, soft reset and semi-soft reset.
+The hard reset completely restarts the application while the soft reset serves more like a back button functionality, bringing the application back to the overview screen.
+The specific actions are specified in the config file, represented with the words from the alphabet.
+Before each new query it is checked if a reset should occur, which will happen if the last successfully executed action was specified in the config.
+This was most likely implemented so that when reaching a final state, where it is not possible to go to any new state, it would be possible to continue the exploration.
+This way it is possible to not include the back buttons in the state machines, which would otherwise make them much more complicated.
 
-The tool had some  
+#### Working with the tool
+
+It was not without trouble to get the tool working correctly.
+In the early stages we had troubles with running the tool without errors and then to make it work correctly for our application.
+
+Firstly, there was a script missing from the repository on GitHub that was necessary to create the alphabet from the UI screen dumps.
+Luckily, we could contact the developers of the tool and get the missing script.
+We tried to use the previously described method `alphabet:create` to create the alphabet but there were errors in the code that we were not able to fix.
+Instead we bypasses that method and used a script of theirs to manually create the alphabet.
+In this process we also had troubles with interactions with Appium.
+There had been some changes in the Appium code after the publication of the tool so we had to update the code to match those changes [[1](#type-change)].
+
+When we got the tool running, we then had to make the tool work correctly with our application.
+Besides changing the config to reference our application, we had to modify some parts of the code, such as disabling login that was performed for the bunq app.
+The problem that required the most effort was making the reset implementation work correctly.
+Like stated before, the reset was only performed after executing some specified actions.
+After discussing this in the lab with the teachers of the course, we thought that this implementation should be changed so that it would always reset before each new query using hard reset.
+After doing those changes in the code, we also had to change how the tool restarted the application since the previous implementation gave errors.
+To open and close the application, methods from Appium were used that threw exceptions.
+Instead we modified the code so it wouldn't call Appium to perform this but instead execute at runtime an adb instruction.
+
+Finally, we had studied fuzzing extensively by investing a lot of time into studying papers about the subject.
+It was decided much later to also create a FSM for an application but not only to fuzz it.
+We had therefore much less knowledge about the subject which slowed the process significantly.
 
 
-### Plan
+## Applications used
 
-* What we do with the tool
+After getting these tools to work we could finally apply them on two Android applications.
+In the time of starting this project, we did not have any application that we had wrote that fitted nicely for this tool (e.g. had non-xml layout).
+We therefore looked for Open Source Android applications that might be interesting to apply these tools on.
+We found the SageMath application which is a mathematics software to calculate and plot graphs from given input [[2](#sagemath-github)].
+Later on in the project, one of the team members had finished work on another course (Hacking Lab) where he created an application for peer to peer communication, called UDPClient.
+We thought it would be very interesting to also apply the tool on our own written code.
+Also, after having had some trouble with using the SageMath application, we hoped that it would be
+These two applications and the process of applying the tools on them will be described in the next sections.
 
 ## SageMath
 
-SageMath is a free open-source mathematics software system licensed under the GPL. It builds on top of many existing open-source packages: NumPy, SciPy, matplotlib, Sympy, Maxima, GAP, FLINT, R and many more. Moreover, SageMath won the  first prize in the scientific software division of Les Trophées du Libre, an international competition for free software in 2007. In 2012 it was one of the projects selected for the Google Summer of Code. These reasons led us to choose this application and try to fuzz it.
+SageMath is a free open-source mathematics software system licensed under the GPL [[3](#sagemath)]. It builds on top of many existing open-source packages: NumPy, SciPy, matplotlib, Sympy, Maxima, GAP, FLINT, R and many more. Moreover, SageMath won the  first prize in the scientific software division of Les Trophées du Libre, an international competition for free software in 2007. In 2012 it was one of the projects selected for the Google Summer of Code. These reasons led us to choose this application and try to fuzz it.
 
 ### SageMath Fuzzing
 With the SageMath application we stumbled upon problems while using the fuzzing tool, as we mentioned before. After analyzing the applications architecture and implementation, we discovered some weak points that could be exploited with fuzzing. These weak points as well as their limitations led us to extend the functionalities of the fuzzing tool.
@@ -180,9 +217,18 @@ The application does not include many fuzzing points from the perspective that t
 
 ### UDPClient State Machine
 
+* The alphabet we used
+* The different tries with restart
+
 ### Discussions (maybe)
 * Summerize what we were able to do and what not
 
 ## Future Work
 
 ## Conclusion
+
+## References
+
+1. <div id="type-change"/> Appium issue for data type change, https://github.com/appium/appium/issues/6214
+2. <div id="sagemath-github"/> https://github.com/sagemath/android
+3. <div id="sagemath"/> http://www.sagemath.org/
