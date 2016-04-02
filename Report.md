@@ -188,6 +188,6 @@ The application does not include many fuzzing points from the perspective that t
 ### Discussions (maybe)
 * Summerize what we were able to do and what not
 
-## Future Work
 
-## Conclusion
+## Future Work / Conclusion
+After extending the implemented tools, we had an automated process to fuzz android applications with random inputs and random actions on its elements. Using this we were able to successfully fuzz two applications and gain better insight about them. Moreover, the type of fuzzing cases varied from text input to random click actions.
