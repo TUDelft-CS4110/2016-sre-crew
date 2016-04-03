@@ -125,10 +125,20 @@ The alphabet is retrieved dumping the screens of the application.
 Every screen contains UI elements that allow different actions.
 For this reason the `adb shell uiautomator dump` functionality is used.
 Using this command an XML file containing a dump of the screen is obtained and from this file all the possible actions are extracted and put into the alphabet.
-An example of these actions is:  
-`push%//android.widget.FrameLayout[1][@index='0' and @resource-id='' and contains(@text, '') and @content-desc='']/android.widget.ListView[1][@index='0' and @resource-id='' and contains(@text, '') and @content-desc='']#125#65`  
-which represent the action of pushing an element contained in a `ListView`.  
-The tool provide two functionalities for this purpose:
+The words in the alphabet have the following structure:  
+```
+action%param1#param2#...#paramx
+```
+The % separates the action from the parameters and the # separates the parameters.
+The actions available are `push`, `chekc` and `enterText`.
+One of these three actions combined with the parameters that represent the xPath of the specific component creates a word for the alphabet.
+An example of such a word is:  
+```
+push%//android.widget.FrameLayout[1][@index='0' and @resource-id='' and contains(@text, '') and @content-desc='']/android.widget.ListView[1][@index='0' and @resource-id='' and contains(@text, '') and @content-desc='']#125#65
+```  
+
+This represents the action of pushing an element contained in a `ListView`.  
+The tool provide two functionalities for the purpose of generating this alphabet:
 1. The first one `alphabet:create` helps the user dumping the screens of the application.
 2. The second one `alphabet:compose` merge all the actions obtained from the screen dumps and compose the alphabet of the finite state machine.
 
@@ -144,7 +154,7 @@ These answers can be `0-OK` or `1-NOTFOUND` depending on the fact that the syste
 When it considers to have an accurate representation of the system under learning (_SUL_) tries to test this representation sending the generated state machine to the teacher so that it can test it with different _counterexamples_.
 If the tests succeed the learning procedure stops and provides the user with a `dot` graph of the system. Otherwise it starts a new learning round improved with what went wrong in the last round.
 
-Afterwards, when the automata is generated it contains the different states that depict the system along with a sink state where all the action that are not accepted from a state (all those marked as `1-NOTFOUND`) go. 
+Afterwards, when the automata is generated it contains the different states that depict the system along with a sink state where all the action that are not accepted from a state (all those marked as `1-NOTFOUND`) go.
 
 #### Reset
 The bunq tool offers possibilities to restart the execution of actions after executing some specified actions.
@@ -233,18 +243,63 @@ The application does not include many fuzzing points from the perspective that t
 
 ### UDPClient State Machine
 
-* The alphabet we used
-* The different tries with restart
+As mentioned before the first thing to do is creating the alphabet.
+After dumping all the 3 screens of the application `alphabet:compose` has been used to retrieve the alphabet.
+This was composed by 11 words:
 
-The following machine state that was created represents correctly the behavior of the UDPClient application.  
+* **☐** enterText% AddressText
+* **☐** enterText% PortText
+* **☑︎** push% register_button
+* **☑︎** push% find_relays
+* **☐** check% checkBox
+
+
+* **☐** push% spinnerSource
+* **☐** push% spinnerTarget
+* **☐** push% ListView[1]\_1
+* **☐** push% ListView[1]\_2
+* **☑︎** push% RelayButton
+
+* **☑︎** push% RelayListView
+
+The checked ones are the one that has been included in the final version of the alphabet to build the FSM.
+Deciding not to include all the words of the original alphabet into the final one was a a forced choice.
+In fact, we let the learner run for many hours with the complete alphabet without any result.
+The main problems were the speed of appium and the computational power of the laptop on which we were running the experiment.
+All the simulations have been run on the android emulator.
+Running the complete system on a single machine was slowing down significantly the performances of the laptop taking a lot of time for the emulator to perform the actions (many time the emulator got stuck for several minutes before starting again).
+Summing this problem with the slow speed of appium's communication after a whole night running the learner didn't even try a counterexample.
+Therefore we decided to shrink down the alphabet to the most meaningful words in term of state of the system.
+Otherwise it would have required too much time in order to being able to obtain a state machine with the full alphabet.
+These words are the one checked on the list above.
+
+
+The following state machine that was created represents correctly the behavior of the UDPClient application.  
 * _State 0_ represents the first  screen of the aplication. The possible actions on this screen are either the 'Connect/Register to Server' or 'Find Relays' button. If the latter is pressed then the user cannot proceed since he first needs to connect to the server. We can see this behavior with the find_relays arrow that stays at _State 0_. On the other hand if the user clicks the first button he moves to _State 4_.
 * _State 1_ represents the state where all actions arrive if the corresponding alphabet element is not found.
 * _State 2_ represents the state where the user can only press the Relaybutton which as we can see leads to another state.
 * _State 3_ represents the final screen of the application. In this case the only part of the alphabet that is available is the RelayListView which when clicked remains in the same page. As we can see in the state machine this is represented correctly with the arrow that leads back to _State 3_.
 *  _State 4_ represents again the first screen but this time the user has registered. From that state if the user clicks the register button again he stays in the same state. If he presses the Find Relays button he can now proceed to _State 2_.
 
+![State Machine](img/UDP_state_machine.png)
 
-![Machine State](img/UDP_state_machine.png)
+As can be seen from the state machine we chose to keep just these words since they were the only ones responsible of meaningful transitions.
+All the others would have resulted just in loops on the same state.
+We decided to add one of these loops as a proof of concept adding the `RelayListView` that starts and ends in _S<sub>3</sub>_, but keeping all of them would have been a barrier in producing the final automaton.
+
+Another big obstacle that we encountered while working with the state machine learner was the reset of the application.
+We explained earlier that the initial version of the tool wasn't performing any kind of reset of the application returning meaningless state machines.
+In [**FIGURE REF**] we have a simplified example of a state machine generated without resetting the application before each query.
+We removed useless transitions from the dot file to make the graph smaller and more readable but the significant part of the graph is still there.
+As can be observed comparing the graph in [**FIGURE REF PROPER GRAPH**] and the one in [**FIGURE REF**] the transitions in the latter have no logical connections.
+The learner believed that it was possible to reach the `spinnerTarget` from _S<sub>0</sub>_ when this is not even in the first page of the application.
+After interpreting this graph we realized that we had a problem with the tool and digging into the code we figured out that we needed to set up the reset conditions for which the application had to be restarted.
+At the beginning we erroneously set the reset condition just when the system was reaching the final page and clicking on the the `RelayListView`.
+Then, as explained before, we fixed this error and the one connected with the restart process after talking with the teachers.
+
+![Wrong State Machine](img/UDP_wrong_state_machine.png)
+
+
 
 ### Discussions (maybe)
 * Summerize what we were able to do and what not
