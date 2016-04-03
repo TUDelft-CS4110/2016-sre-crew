@@ -252,14 +252,11 @@ This was composed by 11 words:
 * **☑︎** push% register_button
 * **☑︎** push% find_relays
 * **☐** check% checkBox
-
-
 * **☐** push% spinnerSource
 * **☐** push% spinnerTarget
 * **☐** push% ListView[1]\_1
 * **☐** push% ListView[1]\_2
 * **☑︎** push% RelayButton
-
 * **☑︎** push% RelayListView
 
 The checked ones are the one that has been included in the final version of the alphabet to build the FSM.
