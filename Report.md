@@ -20,7 +20,13 @@ The progress of using the tool will be described, the results from using it alon
 
 ### Fuzzing
 
-* What is fuzzing and what is its benefits
+As already thoroughly explained in our summary [**REF TO SUMMARY**] the purpose of fuzzing is to test boundary conditions in an automated way.
+The main idea is that boundary conditions are the most relevant to check since they can cause an elevation of privilege.
+However this is not always the case.
+Sometimes fuzzing is used merely to check for crashes on the application in an automated way in order to fix them without having the burden of manually generating test cases.
+The concept behind it remains the same, the difference resides in the purpose.
+
+
 
 ### State Machines
 
@@ -28,9 +34,6 @@ Finite State Machines (FSM) can be used to examine and test software implementat
 Analyzing FSM's can provide information about possible bugs and deadlocks and can show if all possible paths in the software are correct and secure [REFERENCE SLIDES].
 It could happen that transitions or states are identified that are not supposed to be there or when entering a certain state, it is not possible to get to another state from there.... NOT FINISHED
 
-## Tools
-
-* What already existed
 
 ### Fuzzing Tool
 #### Description
@@ -228,17 +231,17 @@ As mentioned before the first thing to do is creating the alphabet.
 After dumping all the 3 screens of the application `alphabet:compose` has been used to retrieve the alphabet.
 This was composed by 11 words:
 
-* **☐** enterText% AddressText
-* **☐** enterText% PortText
-* **☑︎** push% register_button
-* **☑︎** push% find_relays
-* **☐** check% checkBox
-* **☐** push% spinnerSource
-* **☐** push% spinnerTarget
-* **☐** push% ListView[1]\_1
-* **☐** push% ListView[1]\_2
-* **☑︎** push% RelayButton
-* **☑︎** push% RelayListView
+**☐** enterText% AddressText  
+**☐** enterText% PortText  
+**☑︎** push% register_button  
+**☑︎** push% find_relays  
+**☐** check% checkBox  
+**☐** push% spinnerSource  
+**☐** push% spinnerTarget  
+**☐** push% ListView[1]\_1  
+**☐** push% ListView[1]\_2  
+**☑︎** push% RelayButton  
+**☑︎** push% RelayListView  
 
 The checked ones are the one that has been included in the final version of the alphabet to build the FSM.
 Deciding not to include all the words of the original alphabet into the final one was a a forced choice.
@@ -314,7 +317,7 @@ The alphabet therefore was made out of the following (shortened) words:
 
 The following figure shows the corresponding FSM ([Figure 11](#Figure11)):
 
-![SageMath FSM](img/sage_fsm.png)  
+![SageMath FSM](img/sage_create.png)  
 <a name="Figure11"></a>Figure 11: SageMath FSM
 
 * **State 0**: The original state of the application in the first screen.
