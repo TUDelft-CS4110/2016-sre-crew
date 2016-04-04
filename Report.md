@@ -246,11 +246,10 @@ The application does not include many fuzzing points from the perspective that t
 As mentioned before the first thing to do is creating the alphabet.
 After dumping all the 3 screens [Figure 5](#Figure_5)of the application `alphabet:compose` has been used to retrieve the alphabet.
 <p id = "Figure 5"></p>
-<div style="clear:left;">
 <img style="width: 150px; margin-left:10px; margin-top:10px" src="/img/main_screen.png">
 <img style="width: 150px; margin-left:10px; margin-top:10px" src="/img/second_page.png">
-<img style="width: 150px; margin-left:10px; margin-top:10px" src="/img/third_page.png">
-</div>
+<img style="width: 150px; margin-left:10px; margin-top:10px; clear:left" src="/img/third_page.png">
+
 <div style='text-align:center'>Figure 5. Alphabet Elements        </div>
 
 The alphabet retrieved was composed by 11 words.
