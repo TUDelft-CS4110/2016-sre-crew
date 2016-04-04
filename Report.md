@@ -98,10 +98,10 @@ We added two  function calls inside the `DriveUiAutomator.java` which exposed tw
 Based on these two new functionalities, we introduced a XML template file with actions that automate the process of fuzzing any android application. For the template, the user needs to put the target application on the top left corner of the android virtual device and the devices size should be that of a normal  phone and not tablet. The action set consists of three sub action sets that are the three steps in the fuzzing process which we can see in [Figure 2](Figure_2) :
 
 
-<p id="Figure_2">
+<p id="Figure_2"></p>
 !![XML Template](img/xml_file.png)
 <div style='text-align:center'>Figure 2. XML Action Set</div>
-</p>
+
 
 1. The first action clicks on the coordinates on the top left corner of the android device where we have placed the target application as we can see in [Figure 3](Figure_3). Also we get the string that shows the current package name to verify that we are inside the application.
 
@@ -113,10 +113,10 @@ Based on these two new functionalities, we introduced a XML template file with a
 
 
 
-<p id="Figure_3">
+<p id="Figure_3"></p>
 ![Application Position](img/app_position.png)![Crash Position](img/error_position.png)
 <div style='text-align:center'>Figure 3. Android Application and Android Crash Button Position          </div>
-</p>
+
 
 
 ### fsm-learner
@@ -234,10 +234,10 @@ The application does not include many fuzzing points from the perspective that t
 
 
 
-<p id="Figure_4">
+<p id="Figure_4"></p>
 ![Fuzzing case](img/udpclientFuzzing.png) ![Fuzzing case 2](img/udpclientFuzzing2.png)
 <div style='text-align:center'>Figure 4. UDPClient Fuzzing Points          </div>
-</p>
+
 
 
 
@@ -245,14 +245,14 @@ The application does not include many fuzzing points from the perspective that t
 
 As mentioned before the first thing to do is creating the alphabet.
 After dumping all the 3 screens [Figure 5](Figure_5)of the application `alphabet:compose` has been used to retrieve the alphabet.
-<p id = "Figure 5">
+<p id = "Figure 5"></p>
 <div style="clear:left;">
 <img style="width: 150px; margin-left:10px; margin-top:10px" src="/img/main_screen.png">
 <img style="width: 150px; margin-left:10px; margin-top:10px" src="/img/second_page.png">
 <img style="width: 150px; margin-left:10px; margin-top:10px" src="/img/third_page.png">
 </div>
 <div style='text-align:center'>Figure 5. Alphabet Elements        </div>
-</p>
+
 The alphabet retrieved was composed by 11 words.
 These are listed below split into different sections based on the screen they refer to.
 
@@ -290,10 +290,10 @@ The following state machine that was created represents correctly the behavior o
 * **State 3**: represents the final screen of the application. In this case the only part of the alphabet that is available is the RelayListView which when clicked remains in the same page. As we can see in the state machine this is represented correctly with the arrow that leads back to _S<sub>3</sub>_.
 *  **State 4**: represents again the first screen but this time the user has registered. From that state if the user clicks the register button again he stays in the same state. If he presses the Find Relays button he can now proceed to _S<sub>2</sub>_.
 
-<p id="Figure_6">
+<p id="Figure_6"></p>
 ![State Machine](img/UDP_state_machine.png)
 <div style='text-align:center'>Figure 6. UDPClient State Machine</div>
-</p>
+
 
 As can be seen from the state machine we chose to keep just these words since they were the only ones responsible of meaningful transitions.
 All the others would have resulted just in loops on the same state.
@@ -310,10 +310,10 @@ At the beginning we erroneously set the reset condition just when the system was
 Then, as explained before, we fixed this error and the one connected with the restart process after talking with the teachers.
 
 
-<p id="Figure_7">
+<p id="Figure_7"></p>
 ![Wrong State Machine](img/UDP_wrong_state_machine.png)
 <div style='text-align:center'>Figure 7. UDPClient  Wrong State Machine</div>
-</p>
+
 
 ### Discussions (maybe)
 * Summerize what we were able to do and what not
@@ -331,10 +331,10 @@ With the SageMath application we stumbled upon problems while using the fuzzing 
 
 
 
-<p id="Figure_8">
+<p id="Figure_8"></p>
 ![SageMath Fuzzing 1](img/socketFuzzing.png)![SageMath Fuzzing 2](img/groupNameFuzzing.png)
 <div style='text-align:center'>Figure 8. SageMath Fuzzing          </div>
-</p>
+
 
 
 ### Sage State Machine
@@ -353,9 +353,9 @@ The alphabet therefore was made out of the following (shortened) words:
 
 The following figure shows the corresponding FSM ([Figure 9](Figure_9)):
 
-<p id="Figure_9">
+<p id="Figure_9"></p>
 ![SageMath FSM](img/sage_create.png) <div style='text-align:center'>Figure 9. SageMath FSM        </div>
-</p>
+
 
 * **State 0**: The original state of the application in the first screen.
 Here the only possible action from the alphabet is to press the menu_add button.
