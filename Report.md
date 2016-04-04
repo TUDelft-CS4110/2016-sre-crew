@@ -34,9 +34,6 @@ Finite State Machines (FSM) can be used to examine and test software implementat
 Analyzing FSM's can provide information about possible bugs and deadlocks and can show if all possible paths in the software are correct and secure [REFERENCE SLIDES].
 It could happen that transitions or states are identified that are not supposed to be there or when entering a certain state, it is not possible to get to another state from there.... NOT FINISHED
 
-## Tools
-
-* What already existed
 
 ### Fuzzing Tool
 #### Description
