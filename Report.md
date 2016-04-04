@@ -2,9 +2,9 @@
 
 ## Introduction
 
-Usage of softwares is increasing every year along with evolving technology.
-Software is made for multiple different purposes and require distinctive resources and security measures.
-What is common to most software is that it is supposed to work correctly and not have bugs or security breaches.
+Usage of software is increasing every year along with evolving technology.
+Software is made for multiple different purposes and requires distinctive resources and security measures.
+What is common to most software is that it should work correctly and not have bugs or security breaches.
 To ensure correctness, software has to be tested extensively.
 With software getting more complex, the more difficult it is to test it.
 Alongside the constant evolution of software, new automated testing methods have also been introduced.
@@ -13,36 +13,34 @@ In this paper we discuss two state-of-the-art techniques for testing the correct
 The reason why we analyze these two methods is because of a tool that was made less than a year ago at Delft University of Technology.
 This tool was developed as a Bachelor project for the IT bank company [bunq](https://www.bunq.com) to test their iOS and Android applications.
 The tool is split in two parts, [fuzzer](https://github.com/bunqcom/fuzzer) for fuzzing and [fsm-learner](https://github.com/bunqcom/fsm-learner) for learning finite state machines.
-The tool was made specifically for the bunq applications but with some configuration changes it is possible to apply it on any other application.
+The tool was made specifically for the bunq applications but with some configuration changes it is possible to apply it on other applications.
 
 In this paper we will analyze the fuzzer and fsm-learner tools and apply them on two very different applications.
-The progress of using the tool will be described, the results from using it along with alternations to the tool and possible future work.
+The progress of using the tool will be described, the results from using it along with alternations made to the tool and possible future work.
 
 ### Fuzzing
 
-As already thoroughly explained in our summary [**REF TO SUMMARY**] the purpose of fuzzing is to test boundary conditions in an automated way.
+As already thoroughly explained in our [summary](https://github.com/TUDelft-CS4110/2016-sre-crew/blob/master/Summary.md) the purpose of fuzzing is to test boundary conditions in an automated way.
 The main idea is that boundary conditions are the most relevant to check since they can cause an elevation of privilege.
 However this is not always the case.
 Sometimes fuzzing is used merely to check for crashes on the application in an automated way in order to fix them without having the burden of manually generating test cases.
 The concept behind it remains the same, the difference resides in the purpose.
 
-
-
 ### State Machines
 
 Finite State Machines (FSM) can be used to examine and test software implementations.
-Analyzing FSM's can provide information about possible bugs and deadlocks and can show if all possible paths in the software are correct and secure [REFERENCE SLIDES].
-It could happen that transitions or states are identified that are not supposed to be there or when entering a certain state, it is not possible to get to another state from there.... NOT FINISHED
+Analyzing FSM's can provide information about possible bugs and deadlocks and can show if all possible paths in the software are correct and secure [[4](#sm-slides)].
+It could happen that transitions or states are identified that are not supposed to be there or when entering a certain state, it is not possible to get to another state from there.
+Besides finding unwanted behavior, FSM's can provide developers with a better understanding of a system's implementation.
 
 ## Tools
 
-* What already existed
+Hereafter we will describe the two tools that were used and the complications with using them.
 
-### Fuzzing Tool
-#### Description
-In order to fuzz an android application, we need to be able to emulate random action, insert input into the android device and analyze the results. For that reason we use the fuzzing tool described in the introduction. The architecture of the tool consists of two  sub-applications, one android background application called fuzzer-android-server that runs on the target device and one desktop application called Pc-Client that sends information to the android application. The communication between these two applications is established through a socket connection for sending data back and forth.
+### fuzzer
+In order to fuzz an android application, we need to be able to emulate random actions, insert input into the android device and analyze the results. For that reason we use the fuzzing tool mentioned in the introduction. The user can specify actions which vary from clicking a button to entering random text to an input field and then emulate them on the android application. With the repetition of a random  set of random actions, eventually the user may be able to find a sequence that will crash the application. The architecture of the tool consists of two  sub-applications, one android background application alled fuzzer-android-server that runs on the target device and one desktop application called Pc-Client that sends information to the android application. The communication between these two applications is established through a socket connection for sending data back and forth.
 
-**fuzzer-android-server** : This is a server that runs on the background of the android application. First it starts the socket so it can receive the data, in the form of ActionInstruction objects and then waits for the incoming data. The information are parsed and interpreted using the `UIAutomator`. The `UIAutomator` is a UI testing framework that provides a set of APIs in order to provide interaction with a user app. Specifically the implemented functionalities utilize the API calls of the two android objects `UiObject` and  `UiDevice`.
+**fuzzer-android-server** : This is a server that runs on the background of the android application. First it starts the socket so it can receive the data, in the form of ActionInstruction objects and then waits for the incoming data. The information are parsed and interpreted using the `UIAutomator`. The [`UIAutomator`](http://developer.android.com/tools/testing-support-library/index.html#UIAutomator) is a UI testing framework that provides a set of APIs in order to provide interaction with a user app. Specifically the implemented functionalities utilize the API calls of the two android objects [`UiObject`](http://developer.android.com/reference/android/support/test/uiautomator/UiObject.html) and  [`UiDevice`](http://developer.android.com/reference/android/support/test/uiautomator/UiDevice.html).
 
 **Pc-client** : The Pc-client is in charge of creating actions e.g. click button or insert input to a text field and send them to the server. The user can create an XML file and insert the actions he wants to emulate with a specific format. The chance of an action being picked and sent to the server can be specific as well as the order of the actions. Once the XML file is parsed, actions are translated into action objects and sent  to the server through the socket.
 
@@ -359,3 +357,4 @@ After extending the implemented tools, we had an automated process to fuzz andro
 1. <div id="type-change"/> Appium issue for data type change, https://github.com/appium/appium/issues/6214
 2. <div id="sagemath-github"/> SageMath on GitHub, https://github.com/sagemath/android
 3. <div id="sagemath"/> SageMath official site,  http://www.sagemath.org/
+4. <div id="sm-slides"/> Lecture slides about state machine learning,  https://github.com/TUDelft-CS4110/syllabus/blob/master/state_machine_learning_cs4110.pdf
