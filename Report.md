@@ -321,11 +321,16 @@ It is however interesting to see a state machine for one of the cases we discuss
 As previously said, we discovered that the application would crash if given a specific input for a name when creating a group.
 We therefore chose this procecure to create an FSM, when a user tries to create a new group with a name like shown in [Figure 10](#Figure10).
 The user presses the + on the menu and then he can enter a text, press Cancel or press OK.
-The alphabet therefore was made out of the following (shortened) words:
-* push%button1 (OK)
-* push%button2 (Cancel)
-* enterText%groupText
-* push%menu_add
+The alphabet therefore was made out of the following (shortened) words:  
+
+**☑︎** push%button1 (OK)  
+**☑︎** push%button2 (Cancel)  
+**☑︎** enterText%groupText  
+**☑︎** push%menu_add  
+
+
+<img style="width: 200px; margin-left:10px; margin-top:10px" src="/img/sage_main.png">
+<img style="width: 200px; margin-left:10px; margin-top:10px;" src="/img/sage_create_group.png">  
 
 The following figure shows the corresponding FSM ([Figure 11](#Figure11)):
 
