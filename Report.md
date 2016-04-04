@@ -99,7 +99,7 @@ Based on these two new functionalities, we introduced a XML template file with a
 
 
 <p id="Figure_2"></p>
-!![XML Template](img/xml_file.png)
+![XML Template](img/xml_file.png)
 <div style='text-align:center'>Figure 2. XML Action Set</div>
 
 
