@@ -45,10 +45,10 @@ In order to fuzz an android application, we need to be able to emulate random ac
 **Pc-client** : The Pc-client is in charge of creating actions e.g. click button or insert input to a text field and send them to the server. The user can create an XML file and insert the actions he wants to emulate with a specific format. The chance of an action being picked and sent to the server can be specific as well as the order of the actions. Once the XML file is parsed, actions are translated into action objects and sent  to the server through the socket.  
 In  [Figure 1](#Figure_1) we have the overview of how the tool works:
 
-<p id="Figure_1">
+<p id="Figure_1"></p>
 ![Fuzzing Tool](img/Fuzzing-tool.png)
 <div style='text-align:center'>Figure 1. Fuzzing Tool Architecture</div>
-</p>
+
 
 #### Working with the tool
 In our analysis with the tool, we found some limitations with the existing implementation and added our own functionalities to extend the capabilities of the tool. Below we describe these limitations and what we suggest to improve the tool.  
