@@ -52,14 +52,14 @@ In the following figure we have the overview of how the tool works:
 #### Working with the tool
 In our analysis with the tool, we found some limitations with the existing implementation and added our own functionalities to extend the capabilities of the tool. Below we describe these limitations and what we suggest to improve the tool.  
 
-First of all, an action can be applied only to an element that exists as part of the android `layout.xml`. Modern applications tend to use less and less pre-defined XML elements in their activities and instead dynamically generate them through the code. Elements like `Dialogues` and their  buttons or `ActionBarFragment` do not include XML elements for their UI components. As a result the tool in its current state cannot reach all the possible states of an application. Furthermore, the socket communication between the client and server causes a delay when applying the emulated action on the running application. This can limit the fuzzing on the perspective of exhausting memory or network resources. Finally when the fuzzer successfully crashes the running application there doesn't seem to be a clear way to identify this result on the Pc-Client. Because of this problem the fuzzing process we described before cannot be repeated automatically.
+First of all, an action can be applied only to an element that exists as part of the android `layout.xml`. Modern applications tend to use less and less pre-defined XML elements in their activities and instead dynamically generate them through the code. Elements like `Dialogues` and their  buttons or `ActionBarFragment` do not include XML elements for their UI components. As a result the tool in its current state cannot reach all the possible states of an application. Furthermore, the socket communication between the client and server causes a delay when applying the emulated action on the running application. This can limit the fuzzing on the perspective of exhausting memory or network resources. Finally when the fuzzer successfully crashes the running application, there doesn't seem to be a clear way to identify this result on the fuzzer-pc-client. Because of this problem the fuzzing process we described before cannot be repeated automatically.
 
 #### Additions
 For the aforementioned reasons we decided to extend the tool and add some functionalities that partially solve some of the mentioned problems. Afterwards, we use the new functionalities to automate the fuzzing process.
 
 We added two  function calls inside the `DriveUiAutomator.java` which exposed two new values that can be inserted in the `action` field of the XML.
 
-1. **getClassName** : returns the name of the current package. This value will help us determine whether the application has crashed or the current package is the target application. If the application crashes then the result is the string _android_.
+1. **getClassName**: This returns the name of the current package. The value will help us determine whether the application has crashed or if the current package is the target application. If the application crashes then the result is the string `android`.
 
   ````java
   public String getClassName() throws UiObjectNotFoundException {
@@ -68,7 +68,7 @@ We added two  function calls inside the `DriveUiAutomator.java` which exposed tw
   }
   ````
 
-2. **clickSpecific** : Provided with coordinates in the format of `coordinate_X,coordinate_Y` this function emulates a click on that position. The return string informs  if the action was successful or not.
+2. **clickSpecific**: Provided with coordinates in the format of `coordinate_X,coordinate_Y` this function emulates a click on that specific  position. The return string informs  if the action was successful or not.
 
   ````java
   public String clickSpecific(String id) throws UiObjectNotFoundException{
@@ -94,27 +94,23 @@ We added two  function calls inside the `DriveUiAutomator.java` which exposed tw
   }
   ````
 
-Based on these two new functionalities, we introduced a XML template file with actions that automate the process of fuzzing any android application. For the template, the user needs to put the target application on the top left corner (**FIRST FIGURE REF**) of the android virtual device and the devices size should be that of a normal  phone and not tablet. The action set consists of three sub action sets that are the three steps in the fuzzing process which we can see below:
+Based on these two new functionalities, we introduced an XML template file with actions that automate the process of fuzzing any android application. For the template, the user needs to put the target application on the top left corner (**FIRST FIGURE REF**) of the android virtual device and the devices size should be that of a normal  phone and not a tablet. The action set consists of three sub action sets that are the three steps in the fuzzing process which we can see below:
 
 ![XML Template](img/xml_file.png)
 
 1. The first action clicks on the coordinates on the top left corner of the android device where we have placed the target application. Also we get the string that shows the current package name to verify that we are inside the application. (**FIRST FIGURE REF**)
 
-2. This set of action can be defined by the user and is different for every application. Based on the XML elements of every application any combination of actions can be inserted here. Essentially, this is where the fuzzing is implemented.
+2. This set of actions can be defined by the user and is different for every application. Based on the XML elements of every application any combination of actions can be inserted here. Essentially, this is where the fuzzing is implemented.
 
 3. Finally there are two different possibilities of the outcome of our fuzzing. Either the application did not crash and we are still inside the application or the application crashed and we need to restart it. For that reason, we first get the current package name and then perform actions without knowing if the application crashed or not. If it did not crash we  emulate the back action on the device to exit the application. This action is sent  5 times but this number depends on the target application and the activity depth it has. If it has crashed the first back actions will be ignored and we need to emulate a click on the default crash message by android. After that, we emulate again the same back actions. (**SECOND FIGURE REF**)
 
-4. At the end of the fuzzing process, the user can analyze the output and compare the results of the `getClassName` calls. If the application crashed with a specific set of actions then the result of `getClassName` will be `android`. Therefore, the set of actions  between the two calls of `getClassName` with the second call having `android` as a result is the set of actions that crashed the application.
-
+At the end of the fuzzing process, the user can analyze the output and compare the results of the `getClassName` calls. If the application crashed with a specific set of actions then the result of `getClassName` will be `android`. Therefore, the set of actions  between the two calls of `getClassName` with the second call having `android` as a result is the set of actions that crashed the application.
 
 ![Application Position](img/app_position.png)![Crash Position](img/error_position.png)
 
-
-
 ### fsm-learner
 
-The purpose of this tool is this of translating an application into a finite state machine.  
-A finite state automaton can be represented by the quintuple `(𝚺, S, S0, 𝛅, F)`.  
+The purpose of this tool is translating an application into a finite state machine (FSM).  A finite state automaton can be represented by the quintuple `(𝚺, S, S0, 𝛅, F)`.  
 * **𝚺** is the alphabet that the FSM accepts.
 This considered in the case of an android application is the list of possible actions available in every specific screen of the application (`EditText`,`CheckBox`, `Button`, etc.).
 * **S** represents a set of states which needs to be _finite_ and _non-empty_.
@@ -123,10 +119,10 @@ This considered in the case of an android application is the list of possible ac
 This represent the transition from one state to the other accepting a specific element of the alphabet.
 * **F** is a finite set of final states (`F ⊆ S`). This can be empty if the system doesn't have any final state.
 
-In order to retrieve a finite state machine from the application all the elements of this quintuple needs to be defined. And this is performed in 2 main steps.
+In order to retrieve a finite state machine from the application all the elements of this quintuple need to be defined. This is performed in two main steps which involves defining the alphabet and the states.
 
 ##### Defining the alphabet 𝚺
-The alphabet is retrieved dumping the screens of the application.
+The alphabet is retrieved by dumping the screens of the application.
 Every screen contains UI elements that allow different actions.
 For this reason the `adb shell uiautomator dump` functionality is used.
 Using this command an XML file containing a dump of the screen is obtained and from this file all the possible actions are extracted and put into the alphabet.
@@ -135,35 +131,35 @@ The words in the alphabet have the following structure:
 action%param1#param2#...#paramx
 ```
 The % separates the action from the parameters and the # separates the parameters.
-The actions available are `push`, `chekc` and `enterText`.
+The actions available are `push`, `check` and `enterText`.
 One of these three actions combined with the parameters that represent the xPath of the specific component creates a word for the alphabet.
 An example of such a word is:  
 ```
 push%//android.widget.FrameLayout[1][@index='0' and @resource-id='' and contains(@text, '') and @content-desc='']/android.widget.ListView[1][@index='0' and @resource-id='' and contains(@text, '') and @content-desc='']#125#65
 ```  
 
-This represents the action of pushing an element contained in a `ListView`.  
+This represents the action of pushing an element contained in a `ListView`.
 The tool provide two functionalities for the purpose of generating this alphabet:
 1. The first one `alphabet:create` helps the user dumping the screens of the application.
-2. The second one `alphabet:compose` merge all the actions obtained from the screen dumps and compose the alphabet of the finite state machine.
+2. The second one `alphabet:compose` merges all the actions obtained from the screen dumps and composes the alphabet of the finite state machine.
 
-##### Defining the states
+##### Defining the states S
 After defining the alphabet **𝚺** the learning process starts.
-The tool is split in 2 parts:
+The tool is split in two parts:
 * **Teacher:** The teacher executes the action that is instructed to perform.
-These actions are sent to the device using [appium](http://appium.io) which makes possible to perform automated application on the device.
+These actions are sent to the device using [appium](http://appium.io) which makes it possible to perform automated actions on the device.
 * **Learner:** The learner executes the learning algorithm trying to create the state machine.
-It is in charge of providing the teacher with the action that wants to execute.
+It is in charge of providing the teacher with the action that should be executed.
 After the action is executed the learner stores the result provided  by the teacher to refine its knowledge about the system.
 These answers can be `0-OK` or `1-NOTFOUND` depending on the fact that the system is able to perform or not such an action from that specific condition.
-When it considers to have an accurate representation of the system under learning (_SUL_) tries to test this representation sending the generated state machine to the teacher so that it can test it with different _counterexamples_.
+When it considers to have an accurate representation of the system under learning (_SUL_), it tries to test this representation sending the generated state machine to the teacher so that it can test it with different _counterexamples_.
 If the tests succeed the learning procedure stops and provides the user with a `dot` graph of the system. Otherwise it starts a new learning round improved with what went wrong in the last round.
 
 Afterwards, when the automata is generated it contains the different states that depict the system along with a sink state where all the action that are not accepted from a state (all those marked as `1-NOTFOUND`) go.
 
-#### Reset
-The bunq tool offers possibilities to restart the execution of actions after executing some specified actions.
-This can be done in three possible ways: hard reset, soft reset and semi-soft reset.
+#### Query execution
+The tool offers possibilities to restart the execution of a query after having executed some specified action.
+This can be done in three possible ways: _hard reset, soft reset_ and _semi-soft reset_.
 The hard reset completely restarts the application while the soft reset serves more like a back button functionality, bringing the application back to the overview screen.
 The specific actions are specified in the config file, represented with the words from the alphabet.
 Before each new query it is checked if a reset should occur, which will happen if the last successfully executed action was specified in the config.
@@ -173,11 +169,11 @@ This way it is possible to not include the back buttons in the state machines, w
 #### Working with the tool
 
 It was not without trouble to get the tool working correctly.
-In the early stages we had troubles with running the tool without errors and then to make it work correctly for our application.
+In the early stages we had troubles with running the tool without errors and then to make it work correctly for our applications.
 
 Firstly, there was a script missing from the repository on GitHub that was necessary to create the alphabet from the UI screen dumps.
 Luckily, we could contact the developers of the tool and get the missing script.
-We tried to use the previously described method `alphabet:create` to create the alphabet but there were errors in the code that we were not able to fix.
+We tried to use the previously described method `alphabet:create` to create the alphabet but there were errors in the code that we were unable to fix.
 Instead we bypasses that method and used a script of theirs to manually create the alphabet.
 In this process we also had troubles with interactions with Appium.
 There had been some changes in the Appium code after the publication of the tool so we had to update the code to match those changes [[1](#type-change)].
@@ -192,8 +188,8 @@ To open and close the application, methods from Appium were used that threw exce
 Instead we modified the code so it wouldn't call Appium to perform this but instead execute at runtime an adb instruction.
 
 Finally, we had studied fuzzing extensively by investing a lot of time into studying papers about the subject.
-It was decided much later to also create a FSM for an application but not only to fuzz it.
-We had therefore much less knowledge about the subject which slowed the process significantly.
+It was decided much later to also create an FSM for an application but not only to fuzz it.
+We had therefore much less knowledge about the subject which significantly slowed down the process.
 
 
 ## Applications used
@@ -201,7 +197,7 @@ We had therefore much less knowledge about the subject which slowed the process 
 After getting these tools to work we could finally apply them on two Android applications.
 In the time of starting this project, we did not have any application that we had wrote that fitted nicely for this tool (e.g. had non-xml layout).
 We therefore looked for Open Source Android applications that might be interesting to apply these tools on.
-We found the SageMath application which is a mathematics software to calculate and plot graphs from given input [[2](#sagemath-github)].
+We found the [SageMath](https://github.com/sagemath/android) application which is a mathematics software to calculate and plot graphs from a given input.
 Later on in the project, one of the team members had finished work on another course (Hacking Lab) where he created an application for peer to peer communication, called UDPClient.
 We thought it would be very interesting to also apply the tool on our own written code.
 Also, after having had some trouble with using the SageMath application, we hoped that it would be
@@ -356,6 +352,5 @@ After extending the implemented tools, we had an automated process to fuzz andro
 ## References
 
 1. <div id="type-change"/> Appium issue for data type change, https://github.com/appium/appium/issues/6214
-2. <div id="sagemath-github"/> SageMath on GitHub, https://github.com/sagemath/android
 3. <div id="sagemath"/> SageMath official site,  http://www.sagemath.org/
 4. <div id="sm-slides"/> Lecture slides about state machine learning,  https://github.com/TUDelft-CS4110/syllabus/blob/master/state_machine_learning_cs4110.pdf
