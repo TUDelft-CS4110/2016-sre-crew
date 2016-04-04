@@ -42,15 +42,16 @@ In order to fuzz an android application, we need to be able to emulate random ac
 
 **fuzzer-android-server**: This is a server that runs on the background of the android application. First it starts the socket so it can receive the data, in the form of `ActionInstruction` objects and then waits for the incoming data. The information is parsed and interpreted using the `UIAutomator`. The [`UIAutomator`](http://developer.android.com/tools/testing-support-library/index.html#UIAutomator) is a UI testing framework that provides a set of APIs in order to provide interaction with a user app. Specifically the implemented functionalities utilize the API calls of the two android objects [`UiObject`](http://developer.android.com/reference/android/support/test/uiautomator/UiObject.html) and  [`UiDevice`](http://developer.android.com/reference/android/support/test/uiautomator/UiDevice.html).
 
-**Pc-client**: The Pc-client is in charge of creating actions e.g. click button or insert input to a text field and send them to the server. The user can create an XML file and insert the actions he wants to emulate with a specific format. The chance of an action being picked and sent to the server can be specific as well as the order of the actions. Once the XML file is parsed, actions are translated into action objects and sent  to the server through the socket.
+**fuzzer-pc-client**: The pc-client is in charge of creating actions e.g. click a button or insert an input to a text field and then send them to the server. The user can create an XML file and insert the actions he wants to emulate with a specific format. The chance of an action being picked and sent to the server can be specific as well as the order of the actions. Once the XML file is parsed, actions are translated into action objects and sent  to the server through the socket.
 
-For our fuzzing implementation, we used a file with various values as input. The input stretched form text strings of various sizes to numbers and special characters.
+For our fuzzing approach, we used a file with various values as input. The input stretched from text strings of various sizes to numbers and special characters.
 
 In the following figure we have the overview of how the tool works:
 ![Fuzzing Tool](img/Fuzzing-tool.png)
 
 #### Working with the tool
 In our analysis with the tool, we found some limitations with the existing implementation and added our own functionalities to extend the capabilities of the tool. Below we describe these limitations and what we suggest to improve the tool.  
+
 First of all, an action can be applied only to an element that exists as part of the android `layout.xml`. Modern applications tend to use less and less pre-defined XML elements in their activities and instead dynamically generate them through the code. Elements like `Dialogues` and their  buttons or `ActionBarFragment` do not include XML elements for their UI components. As a result the tool in its current state cannot reach all the possible states of an application. Furthermore, the socket communication between the client and server causes a delay when applying the emulated action on the running application. This can limit the fuzzing on the perspective of exhausting memory or network resources. Finally when the fuzzer successfully crashes the running application there doesn't seem to be a clear way to identify this result on the Pc-Client. Because of this problem the fuzzing process we described before cannot be repeated automatically.
 
 #### Additions
