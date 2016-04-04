@@ -314,7 +314,7 @@ The alphabet therefore was made out of the following (shortened) words:
 
 The following figure shows the corresponding FSM ([Figure 11](#Figure11)):
 
-![SageMath FSM](img/sage_fsm.png)  
+![SageMath FSM](img/sage_create.png)  
 <a name="Figure11"></a>Figure 11: SageMath FSM
 
 * **State 0**: The original state of the application in the first screen.
