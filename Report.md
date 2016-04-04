@@ -208,25 +208,6 @@ We thought it would be very interesting to also apply the tool on our own writte
 Also, after having had some trouble with using the SageMath application, we hoped that it would be
 These two applications and the process of applying the tools on them will be described in the next sections.
 
-## SageMath
-
-SageMath is a free open-source mathematics software system licensed under the GPL [[3](#sagemath)]. It builds on top of many existing open-source packages: NumPy, SciPy, matplotlib, Sympy, Maxima, GAP, FLINT, R and many more. Moreover, SageMath won the  first prize in the scientific software division of Les Trophées du Libre, an international competition for free software in 2007. In 2012 it was one of the projects selected for the Google Summer of Code. These reasons led us to choose this application and try to fuzz it.
-
-### SageMath Fuzzing
-With the SageMath application we stumbled upon problems while using the fuzzing tool, as we mentioned before. After analyzing the applications architecture and implementation, we discovered some weak points that could be exploited with fuzzing.
-
-1. The application communicated with a server to send the math equations that were gonna be executed and received the results. This connection was re-established every time with the click of one button.(**REF FIGURE 1**) Therefore, we tried to exhaust the application resources for network capacity and crash it. Although we succeeded when we were manually performing the clicks, with the use of the fuzzing tool the click emulation was too slow to be successful.
-2. The application was using a SQLite database to store strings that were inserted by the user. The problem in this case was that SageMath was using a `Dialogue` layout to insert the new user string. Therefore, the `OK` button could not be retrieved through the XML layout file.   We used the fuzzing tool to insert random input into the field and then called  the `clickSpecific` function for the `OK` button. After various text inputs, the application crashed when a large text was inserted. This occurred because the text was not inserted into the database cause of its size. As a result the reference towards that text was `null` and led to the applications crash when the application tried to display it
-3. One extra functionality of the application was to let the user insert any code he wanted which was executed from the server. The weak point in this case was specific input that caused the server to answer with a `null`. When this occurred the android application crashed during the parsing of the `null` object with the `Gson` library. We believe that although we discovered this kind of weakness, it is not part of the fuzzing process since the input has to be specifically defined but it is worth mentioning.
-
-
-![SageMath Fuzzing 1](img/socketFuzzing.png)![SageMath Fuzzing 2](img/groupNameFuzzing.png)
-
-### Sage State Machine
-
-### Discussions (maybe) (I say we include the discussion in each section of the app)
-* Summerize what we were able to do and what not
-
 ## UDPClient
 
 The UDPClient application is part of the Hacking Lab course assignment of one of our team members. This application is used for peer to peer communication between devices that have the application installed. Every peer first registers to a server and then retrieves information about other registered peers. With the use of the new added functionalities on the fuzzing tool we tried to fuzz it.
@@ -307,11 +288,63 @@ Then, as explained before, we fixed this error and the one connected with the re
 ### Discussions (maybe)
 * Summerize what we were able to do and what not
 
+## SageMath
+
+SageMath is a free open-source mathematics software system licensed under the GPL [[3](#sagemath)]. It builds on top of many existing open-source packages: NumPy, SciPy, matplotlib, Sympy, Maxima, GAP, FLINT, R and many more. Moreover, SageMath won the  first prize in the scientific software division of Les Trophées du Libre, an international competition for free software in 2007. In 2012 it was one of the projects selected for the Google Summer of Code. These reasons led us to choose this application and try to fuzz it.
+
+### SageMath Fuzzing
+With the SageMath application we stumbled upon problems while using the fuzzing tool, as we mentioned before. After analyzing the applications architecture and implementation, we discovered some weak points that could be exploited with fuzzing.
+
+1. The application communicated with a server to send the math equations that were gonna be executed and received the results. This connection was re-established every time with the click of one button.(**REF FIGURE 1**) Therefore, we tried to exhaust the application resources for network capacity and crash it. Although we succeeded when we were manually performing the clicks, with the use of the fuzzing tool the click emulation was too slow to be successful.
+2. The application was using a SQLite database to store strings that were inserted by the user. The problem in this case was that SageMath was using a `Dialogue` layout to insert the new user string. Therefore, the `OK` button could not be retrieved through the XML layout file.   We used the fuzzing tool to insert random input into the field and then called  the `clickSpecific` function for the `OK` button. After various text inputs, the application crashed when a large text was inserted. This occurred because the text was not inserted into the database cause of its size. As a result the reference towards that text was `null` and led to the applications crash when the application tried to display it
+3. One extra functionality of the application was to let the user insert any code he wanted which was executed from the server. The weak point in this case was specific input that caused the server to answer with a `null`. When this occurred the android application crashed during the parsing of the `null` object with the `Gson` library. We believe that although we discovered this kind of weakness, it is not part of the fuzzing process since the input has to be specifically defined but it is worth mentioning.
+
+
+![SageMath Fuzzing 1](img/socketFuzzing.png)
+![SageMath Fuzzing 2](img/groupNameFuzzing.png)  
+<a name="Figure10"></a>Figure 10: Create new group
+
+### Sage State Machine
+
+The SageMath application is rather large with complex functionality.
+It is not feasible to try to make a state machine for the whole application because of the time it would take.
+It is however interesting to see a state machine for one of the cases we discussed when fuzzing the application.
+As previously said, we discovered that the application would crash if given a specific input for a name when creating a group.
+We therefore chose this procecure to create an FSM, when a user tries to create a new group with a name like shown in [Figure 10](#Figure10).
+The user presses the + on the menu and then he can enter a text, press Cancel or press OK.
+The alphabet therefore was made out of the following (shortened) words:
+* push%button1 (OK)
+* push%button2 (Cancel)
+* enterText%groupText
+* push%menu_add
+
+The following figure shows the corresponding FSM ([Figure 11](#Figure11)):
+
+![SageMath FSM](img/sage_create.png)  
+<a name="Figure11"></a>Figure 11: SageMath FSM
+
+* **State 0**: The original state of the application in the first screen.
+Here the only possible action from the alphabet is to press the menu_add button.
+* **State 1**: All NOTFOUND actions will lead to this state.
+* **State 2**: After pressing the menu_add button this state is reached.
+From here the popup is visible and it is possible to enter the groupText or press either of the two buttons, OK or Cancel.
+Pressing Cancel will close the popup and lead back to state 0.
+Pressing OK without having any text entered will not do anything since it is now allowed to create a new group with empty text.
+* **State 3**: Entering text will lead to a new state since now pressing OK has different consequences.
+Like before, pressing Cancel will close the popup and return to state 0.
+Now, pressing OK will create a new group with the name entered in the text field and then close the popup and return to state 0.
+
+This state machine is an accurate description of what happens if these actions are performed in the application.
+In this small example, there don't seem to be any mysterious states or any unwanted transitions.
+
+### Discussions (maybe) (I say we include the discussion in each section of the app)
+* Summerize what we were able to do and what not
+
 ## Future Work / Conclusion
 After extending the implemented tools, we had an automated process to fuzz android applications with random inputs and random actions on its elements. Using this we were able to successfully fuzz two applications and gain better insight about them. Moreover, the type of fuzzing cases varied from text input to random click actions.
 
 ## References
 
 1. <div id="type-change"/> Appium issue for data type change, https://github.com/appium/appium/issues/6214
-2. <div id="sagemath-github"/> https://github.com/sagemath/android
-3. <div id="sagemath"/> http://www.sagemath.org/
+2. <div id="sagemath-github"/> SageMath on GitHub, https://github.com/sagemath/android
+3. <div id="sagemath"/> SageMath official site,  http://www.sagemath.org/
