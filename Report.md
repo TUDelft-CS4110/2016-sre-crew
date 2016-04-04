@@ -230,20 +230,31 @@ The application does not include many fuzzing points from the perspective that t
 ### UDPClient State Machine
 
 As mentioned before the first thing to do is creating the alphabet.
-After dumping all the 3 screens of the application `alphabet:compose` has been used to retrieve the alphabet.
-This was composed by 11 words:
+After dumping all the 3 screens (**FIGURE REF**) of the application `alphabet:compose` has been used to retrieve the alphabet.
+<div style="clear:left;">
+<img style="width: 150px; margin-left:10px; margin-top:10px" src="/img/main_screen.png">
+<img style="width: 150px; margin-left:10px; margin-top:10px" src="/img/second_page.png">
+<img style="width: 150px; margin-left:10px; margin-top:10px" src="/img/third_page.png">
+</div>
+
+The alphabet retrieved was composed by 11 words.
+These are listed below split into different sections based on the screen they refer to.
 
 **☐** enterText% AddressText  
 **☐** enterText% PortText  
 **☑︎** push% register_button  
 **☑︎** push% find_relays  
-**☐** check% checkBox  
+**☐** check% checkBox
+
 **☐** push% spinnerSource  
 **☐** push% spinnerTarget  
 **☐** push% ListView[1]\_1  
 **☐** push% ListView[1]\_2  
 **☑︎** push% RelayButton  
+
 **☑︎** push% RelayListView  
+
+
 
 The checked ones are the one that has been included in the final version of the alphabet to build the FSM.
 Deciding not to include all the words of the original alphabet into the final one was a a forced choice.
@@ -258,11 +269,11 @@ These words are the one checked on the list above.
 
 
 The following state machine that was created represents correctly the behavior of the UDPClient application.  
-* _State 0_ represents the first  screen of the aplication. The possible actions on this screen are either the 'Connect/Register to Server' or 'Find Relays' button. If the latter is pressed then the user cannot proceed since he first needs to connect to the server. We can see this behavior with the find_relays arrow that stays at _State 0_. On the other hand if the user clicks the first button he moves to _State 4_.
-* _State 1_ represents the state where all actions arrive if the corresponding alphabet element is not found.
-* _State 2_ represents the state where the user can only press the Relaybutton which as we can see leads to another state.
-* _State 3_ represents the final screen of the application. In this case the only part of the alphabet that is available is the RelayListView which when clicked remains in the same page. As we can see in the state machine this is represented correctly with the arrow that leads back to _State 3_.
-*  _State 4_ represents again the first screen but this time the user has registered. From that state if the user clicks the register button again he stays in the same state. If he presses the Find Relays button he can now proceed to _State 2_.
+* **State 0**: represents the first  screen of the aplication. The possible actions on this screen are either the 'Connect/Register to Server' or 'Find Relays' button. If the latter is pressed then the user cannot proceed since he first needs to connect to the server. We can see this behavior with the find_relays arrow that stays at _S<sub>0</sub>_. On the other hand if the user clicks the first button he moves to _S<sub>4</sub>_.
+* **State 1**: represents the state where all actions arrive if the corresponding alphabet element is not found.
+* **State 2**: represents the state where the user can only press the Relaybutton which as we can see leads to another state.
+* **State 3**: represents the final screen of the application. In this case the only part of the alphabet that is available is the RelayListView which when clicked remains in the same page. As we can see in the state machine this is represented correctly with the arrow that leads back to _S<sub>3</sub>_.
+*  **State 4**: represents again the first screen but this time the user has registered. From that state if the user clicks the register button again he stays in the same state. If he presses the Find Relays button he can now proceed to _S<sub>2</sub>_.
 
 ![State Machine](img/UDP_state_machine.png)
 
