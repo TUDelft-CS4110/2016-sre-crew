@@ -20,24 +20,25 @@ The progress of using the tool will be described, the results from using it alon
 
 ### Fuzzing
 
-As already thoroughly explained in our summary [**REF TO SUMMARY**] the purpose of fuzzing is to test boundary conditions in an automated way.
+As already thoroughly explained in our [summary](https://github.com/TUDelft-CS4110/2016-sre-crew/blob/master/Summary.md) the purpose of fuzzing is to test boundary conditions in an automated way.
 The main idea is that boundary conditions are the most relevant to check since they can cause an elevation of privilege.
 However this is not always the case.
 Sometimes fuzzing is used merely to check for crashes on the application in an automated way in order to fix them without having the burden of manually generating test cases.
 The concept behind it remains the same, the difference resides in the purpose.
 
-
-
 ### State Machines
 
 Finite State Machines (FSM) can be used to examine and test software implementations.
-Analyzing FSM's can provide information about possible bugs and deadlocks and can show if all possible paths in the software are correct and secure [REFERENCE SLIDES].
-It could happen that transitions or states are identified that are not supposed to be there or when entering a certain state, it is not possible to get to another state from there.... NOT FINISHED
+Analyzing FSM's can provide information about possible bugs and deadlocks and can show if all possible paths in the software are correct and secure [[4](#sm-slides)].
+It could happen that transitions or states are identified that are not supposed to be there or when entering a certain state, it is not possible to get to another state from there.
+Besides finding unwanted behavior, FSM's can provide developers with a better understanding of a system's implementation.
 
+## Tools
 
-### Fuzzing Tool
-#### Description
-In order to fuzz an android application, we need to be able to emulate random action, insert input into the android device and analyze the results. For that reason we use the fuzzing tool described in the introduction. The architecture of the tool consists of two  sub-applications, one android background application called fuzzer-android-server that runs on the target device and one desktop application called Pc-Client that sends information to the android application. The communication between these two applications is established through a socket connection for sending data back and forth.
+Hereafter we will describe the two tools that were used and the complications with using them.
+
+### fuzzer
+In order to fuzz an android application, we need to be able to emulate random actions, insert input into the android device and analyze the results. For that reason we use the fuzzing tool described in the introduction. The architecture of the tool consists of two  sub-applications, one android background application called fuzzer-android-server that runs on the target device and one desktop application called Pc-Client that sends information to the android application. The communication between these two applications is established through a socket connection for sending data back and forth.
 
 **fuzzer-android-server** : This is a server that runs on the background of the android application. First it starts the socket so it can receive the data, in the form of ActionInstruction objects and then waits for the incoming data. The information are parsed and interpreted using the `UIAutomator`. The `UIAutomator` is a UI testing framework that provides a set of APIs in order to provide interaction with a user app. Specifically the implemented functionalities utilize the API calls of the two android objects `UiObject` and  `UiDevice`.
 
@@ -345,3 +346,4 @@ After extending the implemented tools, we had an automated process to fuzz andro
 1. <div id="type-change"/> Appium issue for data type change, https://github.com/appium/appium/issues/6214
 2. <div id="sagemath-github"/> SageMath on GitHub, https://github.com/sagemath/android
 3. <div id="sagemath"/> SageMath official site,  http://www.sagemath.org/
+4. <div id="sm-slides"/> Lecture slides about state machine learning,  https://github.com/TUDelft-CS4110/syllabus/blob/master/state_machine_learning_cs4110.pdf
