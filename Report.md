@@ -95,7 +95,7 @@ We added two  function calls inside the `DriveUiAutomator.java` which exposed tw
   }
   ````
 
-Based on these two new functionalities, we introduced a XML template file with actions that automate the process of fuzzing any android application. For the template, the user needs to put the target application on the top left corner of the android virtual device and the devices size should be that of a normal  phone and not tablet. The action set consists of three sub action sets that are the three steps in the fuzzing process which we can see in [Figure 2](Figure_2) :
+Based on these two new functionalities, we introduced a XML template file with actions that automate the process of fuzzing any android application. For the template, the user needs to put the target application on the top left corner of the android virtual device and the devices size should be that of a normal  phone and not tablet. The action set consists of three sub action sets that are the three steps in the fuzzing process which we can see in [Figure 2](#Figure2) :
 
 
 <p id="Figure_2"></p>
@@ -103,11 +103,11 @@ Based on these two new functionalities, we introduced a XML template file with a
 <div style='text-align:center'>Figure 2. XML Action Set</div>
 
 
-1. The first action clicks on the coordinates on the top left corner of the android device where we have placed the target application as we can see in [Figure 3](Figure_3). Also we get the string that shows the current package name to verify that we are inside the application.
+1. The first action clicks on the coordinates on the top left corner of the android device where we have placed the target application as we can see in [Figure 3](#Figure3). Also we get the string that shows the current package name to verify that we are inside the application.
 
 2. This set of action can be defined by the user and is different for every application. Based on the XML elements of every application any combination of actions can be inserted here. Essentially, this is where the fuzzing is implemented.
 
-3. Finally there are two different possibilities of the outcome of our fuzzing. Either the application did not crash and we are still inside the application or the application crashed and we need to restart it. For that reason, we first get the current package name and then perform actions without knowing if the application crashed or not. If it did not crash we  emulate the back action on the device to exit the application. This action is sent  5 times but this number depends on the target application and the activity depth it has. If it has crashed the first back actions will be ignored and we need to emulate a click on the default crash message by android as we can see in [Figure 3](Figure_3). After that, we emulate again the same back actions.
+3. Finally there are two different possibilities of the outcome of our fuzzing. Either the application did not crash and we are still inside the application or the application crashed and we need to restart it. For that reason, we first get the current package name and then perform actions without knowing if the application crashed or not. If it did not crash we  emulate the back action on the device to exit the application. This action is sent  5 times but this number depends on the target application and the activity depth it has. If it has crashed the first back actions will be ignored and we need to emulate a click on the default crash message by android as we can see in [Figure 3](#Figure3). After that, we emulate again the same back actions.
 
 4. At the end of the fuzzing process, the user can analyze the output and compare the results of the `getClassName` calls. If the application crashed with a specific set of actions then the result of `getClassName` will be `android`. Therefore, the set of actions  between the two calls of `getClassName` with the second call having `android` as a result is the set of actions that crashed the application.
 
@@ -222,13 +222,13 @@ The UDPClient application is part of the Hacking Lab course assignment of one of
 ### UDPClient Fuzzing
 The application does not include many fuzzing points from the perspective that the user cannot insert many different inputs. However, the network architecture of the application exposes different cases where connection variables could have not be initiated properly. Therefore, in our action XML file we included random click actions of buttons with a random chance as well as various text inputs. After running the fuzzing tool for a few hours, we discovered two weak points that caused the application to crash.
 
-1. If a user tried to get the list of registered peers without having first connected to the server ([Figure 4](Figure_4)), the application did not handle correctly the `null` reference and crashed. The existing code did the following check
+1. If a user tried to get the list of registered peers without having first connected to the server ([Figure 4](#Figure4)), the application did not handle correctly the `null` reference and crashed. The existing code did the following check
   ````java
   if ( !(MyRouter == null) && MyRouter.registered)
   ````
   However, the second condition was also evaluated even though the `MyRouter` variable was null. This caused the application to crash.
 
-2. The second weak point that was discovered with the fuzzing tool was a set of actions that ignored some UI elements that are preventing actual users from performing actions. While the application is retrieving from the server the list of users there is a `ProgessDialog` ([Figure 4](Figure_4)) to prevent the user from clicking something. Normally users do not ignore this message but the fuzzing tool kept emulating actions. When a click on the `See Relays` button was emulated but the server had not responded yet with the actual list this caused a `null` reference and crashed the application. In the following picture we can see the `ProgressDialog` and the `See Relays` button in the background.
+2. The second weak point that was discovered with the fuzzing tool was a set of actions that ignored some UI elements that are preventing actual users from performing actions. While the application is retrieving from the server the list of users there is a `ProgessDialog` ([Figure 4](#Figure4)) to prevent the user from clicking something. Normally users do not ignore this message but the fuzzing tool kept emulating actions. When a click on the `See Relays` button was emulated but the server had not responded yet with the actual list this caused a `null` reference and crashed the application. In the following picture we can see the `ProgressDialog` and the `See Relays` button in the background.
 
 3. The available text input for a user are two text fields that correspond to a server IP and Port. After fuzzing with random inputs there was no successful input that crashed this application. As a result from the perspective of text fuzzing, there are no weak points.
 
@@ -244,7 +244,7 @@ The application does not include many fuzzing points from the perspective that t
 ### UDPClient State Machine
 
 As mentioned before the first thing to do is creating the alphabet.
-After dumping all the 3 screens [Figure 5](Figure_5)of the application `alphabet:compose` has been used to retrieve the alphabet.
+After dumping all the 3 screens [Figure 5](#Figure5)of the application `alphabet:compose` has been used to retrieve the alphabet.
 <p id = "Figure 5"></p>
 <div style="clear:left;">
 <img style="width: 150px; margin-left:10px; margin-top:10px" src="/img/main_screen.png">
@@ -301,9 +301,9 @@ We decided to add one of these loops as a proof of concept adding the `RelayList
 
 Another big obstacle that we encountered while working with the state machine learner was the reset of the application.
 We explained earlier that the initial version of the tool wasn't performing any kind of reset of the application returning meaningless state machines.
-In  [Figure 7](Figure_7) we have a simplified example of a state machine generated without resetting the application before each query.
+In  [Figure 7](#Figure7) we have a simplified example of a state machine generated without resetting the application before each query.
 We removed useless transitions from the dot file to make the graph smaller and more readable but the significant part of the graph is still there.
-As can be observed comparing the graph in [Figure 6](Figure_6) and the one in [Figure 7](Figure_7) the transitions in the latter have no logical connections.
+As can be observed comparing the graph in [Figure 6](#Figure6) and the one in [Figure 7](#Figure7) the transitions in the latter have no logical connections.
 The learner believed that it was possible to reach the `spinnerTarget` from _S<sub>0</sub>_ when this is not even in the first page of the application.
 After interpreting this graph we realized that we had a problem with the tool and digging into the code we figured out that we needed to set up the reset conditions for which the application had to be restarted.
 At the beginning we erroneously set the reset condition just when the system was reaching the final page and clicking on the the `RelayListView`.
@@ -325,7 +325,7 @@ SageMath is a free open-source mathematics software system licensed under the GP
 ### SageMath Fuzzing
 With the SageMath application we stumbled upon problems while using the fuzzing tool, as we mentioned before. After analyzing the applications architecture and implementation, we discovered some weak points that could be exploited with fuzzing.
 
-1. The application communicated with a server to send the math equations that were gonna be executed and received the results. This connection was re-established every time with the click of one button([Figure 8](Figure_8)). Therefore, we tried to exhaust the application resources for network capacity and crash it. Although we succeeded when we were manually performing the clicks, with the use of the fuzzing tool the click emulation was too slow to be successful.
+1. The application communicated with a server to send the math equations that were gonna be executed and received the results. This connection was re-established every time with the click of one button([Figure 8](#Figure8)). Therefore, we tried to exhaust the application resources for network capacity and crash it. Although we succeeded when we were manually performing the clicks, with the use of the fuzzing tool the click emulation was too slow to be successful.
 2. The application was using a SQLite database to store strings that were inserted by the user. The problem in this case was that SageMath was using a `Dialogue` layout to insert the new user string. Therefore, the `OK` button could not be retrieved through the XML layout file.   We used the fuzzing tool to insert random input into the field and then called  the `clickSpecific` function for the `OK` button. After various text inputs, the application crashed when a large text was inserted. This occurred because the text was not inserted into the database cause of its size. As a result the reference towards that text was `null` and led to the applications crash when the application tried to display it
 3. One extra functionality of the application was to let the user insert any code he wanted which was executed from the server. The weak point in this case was specific input that caused the server to answer with a `null`. When this occurred the android application crashed during the parsing of the `null` object with the `Gson` library. We believe that although we discovered this kind of weakness, it is not part of the fuzzing process since the input has to be specifically defined but it is worth mentioning.
 
@@ -343,7 +343,7 @@ The SageMath application is rather large with complex functionality.
 It is not feasible to try to make a state machine for the whole application because of the time it would take.
 It is however interesting to see a state machine for one of the cases we discussed when fuzzing the application.
 As previously said, we discovered that the application would crash if given a specific input for a name when creating a group.
-We therefore chose this procecure to create an FSM, when a user tries to create a new group with a name like shown in [Figure 8](Figure_8).
+We therefore chose this procecure to create an FSM, when a user tries to create a new group with a name like shown in [Figure 8](#Figure8).
 The user presses the + on the menu and then he can enter a text, press Cancel or press OK.
 The alphabet therefore was made out of the following (shortened) words:
 * push%button1 (OK)
@@ -351,7 +351,7 @@ The alphabet therefore was made out of the following (shortened) words:
 * enterText%groupText
 * push%menu_add
 
-The following figure shows the corresponding FSM ([Figure 9](Figure_9)):
+The following figure shows the corresponding FSM ([Figure 9](#Figure9)):
 
 <p id="Figure_9"></p>
 ![SageMath FSM](img/sage_create.png) <div style='text-align:center'>Figure 9. SageMath FSM        </div>
