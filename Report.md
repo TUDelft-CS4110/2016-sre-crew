@@ -44,10 +44,12 @@ In order to fuzz an android application, we need to be able to emulate random ac
 
 **Pc-client** : The Pc-client is in charge of creating actions e.g. click button or insert input to a text field and send them to the server. The user can create an XML file and insert the actions he wants to emulate with a specific format. The chance of an action being picked and sent to the server can be specific as well as the order of the actions. Once the XML file is parsed, actions are translated into action objects and sent  to the server through the socket.  
 In  [Figure 1](#Figure_1) we have the overview of how the tool works:
-<a id="Figure_1">
+
+<p id="Figure_1">
 ![Fuzzing Tool](img/Fuzzing-tool.png)
 <div style='text-align:center'>Figure 1. Fuzzing Tool Architecture</div>
-</a>
+</p>
+
 #### Working with the tool
 In our analysis with the tool, we found some limitations with the existing implementation and added our own functionalities to extend the capabilities of the tool. Below we describe these limitations and what we suggest to improve the tool.  
 First of all, an action can be applied only to an element that exists as part of the android `layout.xml`. Modern applications tend to use less and less pre-defined XML elements in their activities and instead dynamically generate them through the code. Elements like `Dialogues` and their  buttons or `ActionBarFragment` do not include XML elements for their UI components. As a result the tool in its current state cannot reach all the possible states of an application. Furthermore, the socket communication between the client and server causes a delay when applying the emulated action on the running application. This can limit the fuzzing on the perspective of exhausting memory or network resources. Finally when the fuzzer successfully crashes the running application there doesn't seem to be a clear way to identify this result on the Pc-Client. Because of this problem the fuzzing process we described before cannot be repeated automatically.For our fuzzing implementation, we used a file with various values as input. The input stretched form text strings of various sizes to numbers and special characters.
@@ -96,10 +98,11 @@ We added two  function calls inside the `DriveUiAutomator.java` which exposed tw
 Based on these two new functionalities, we introduced a XML template file with actions that automate the process of fuzzing any android application. For the template, the user needs to put the target application on the top left corner of the android virtual device and the devices size should be that of a normal  phone and not tablet. The action set consists of three sub action sets that are the three steps in the fuzzing process which we can see in [Figure 2](Figure_2) :
 
 
-<a id="Figure_2">
+<p id="Figure_2">
 !![XML Template](img/xml_file.png)
 <div style='text-align:center'>Figure 2. XML Action Set</div>
-</a>
+</p>
+
 1. The first action clicks on the coordinates on the top left corner of the android device where we have placed the target application as we can see in [Figure 3](Figure_3). Also we get the string that shows the current package name to verify that we are inside the application.
 
 2. This set of action can be defined by the user and is different for every application. Based on the XML elements of every application any combination of actions can be inserted here. Essentially, this is where the fuzzing is implemented.
@@ -110,10 +113,10 @@ Based on these two new functionalities, we introduced a XML template file with a
 
 
 
-<a id="Figure_3">
+<p id="Figure_3">
 ![Application Position](img/app_position.png)![Crash Position](img/error_position.png)
 <div style='text-align:center'>Figure 3. Android Application and Android Crash Button Position          </div>
-</a>
+</p>
 
 
 ### fsm-learner
@@ -231,30 +234,43 @@ The application does not include many fuzzing points from the perspective that t
 
 
 
-<a id="Figure_4">
+<p id="Figure_4">
 ![Fuzzing case](img/udpclientFuzzing.png) ![Fuzzing case 2](img/udpclientFuzzing2.png)
 <div style='text-align:center'>Figure 4. UDPClient Fuzzing Points          </div>
-</a>
+</p>
 
 
 
 ### UDPClient State Machine
 
 As mentioned before the first thing to do is creating the alphabet.
-After dumping all the 3 screens of the application `alphabet:compose` has been used to retrieve the alphabet.
-This was composed by 11 words:
+After dumping all the 3 screens [Figure 5](Figure_5)of the application `alphabet:compose` has been used to retrieve the alphabet.
+<p id = "Figure 5">
+<div style="clear:left;">
+<img style="width: 150px; margin-left:10px; margin-top:10px" src="/img/main_screen.png">
+<img style="width: 150px; margin-left:10px; margin-top:10px" src="/img/second_page.png">
+<img style="width: 150px; margin-left:10px; margin-top:10px" src="/img/third_page.png">
+</div>
+<div style='text-align:center'>Figure 5. Alphabet Elements        </div>
+</p>
+The alphabet retrieved was composed by 11 words.
+These are listed below split into different sections based on the screen they refer to.
 
 **☐** enterText% AddressText  
 **☐** enterText% PortText  
 **☑︎** push% register_button  
 **☑︎** push% find_relays  
-**☐** check% checkBox  
+**☐** check% checkBox
+
 **☐** push% spinnerSource  
 **☐** push% spinnerTarget  
 **☐** push% ListView[1]\_1  
 **☐** push% ListView[1]\_2  
 **☑︎** push% RelayButton  
+
 **☑︎** push% RelayListView  
+
+
 
 The checked ones are the one that has been included in the final version of the alphabet to build the FSM.
 Deciding not to include all the words of the original alphabet into the final one was a a forced choice.
@@ -267,18 +283,17 @@ Therefore we decided to shrink down the alphabet to the most meaningful words in
 Otherwise it would have required too much time in order to being able to obtain a state machine with the full alphabet.
 These words are the one checked on the list above.
 
+The following state machine that was created represents correctly the behavior of the UDPClient application.  
+* **State 0**: represents the first  screen of the aplication. The possible actions on this screen are either the 'Connect/Register to Server' or 'Find Relays' button. If the latter is pressed then the user cannot proceed since he first needs to connect to the server. We can see this behavior with the find_relays arrow that stays at _S<sub>0</sub>_. On the other hand if the user clicks the first button he moves to _S<sub>4</sub>_.
+* **State 1**: represents the state where all actions arrive if the corresponding alphabet element is not found.
+* **State 2**: represents the state where the user can only press the Relaybutton which as we can see leads to another state.
+* **State 3**: represents the final screen of the application. In this case the only part of the alphabet that is available is the RelayListView which when clicked remains in the same page. As we can see in the state machine this is represented correctly with the arrow that leads back to _S<sub>3</sub>_.
+*  **State 4**: represents again the first screen but this time the user has registered. From that state if the user clicks the register button again he stays in the same state. If he presses the Find Relays button he can now proceed to _S<sub>2</sub>_.
 
-The following state machine ([Figure 5](Figure_5)) that was created represents correctly the behavior of the UDPClient application.  
-* _State 0_ represents the first  screen of the aplication. The possible actions on this screen are either the 'Connect/Register to Server' or 'Find Relays' button. If the latter is pressed then the user cannot proceed since he first needs to connect to the server. We can see this behavior with the find_relays arrow that stays at _State 0_. On the other hand if the user clicks the first button he moves to _State 4_.
-* _State 1_ represents the state where all actions arrive if the corresponding alphabet element is not found.
-* _State 2_ represents the state where the user can only press the Relaybutton which as we can see leads to another state.
-* _State 3_ represents the final screen of the application. In this case the only part of the alphabet that is available is the RelayListView which when clicked remains in the same page. As we can see in the state machine this is represented correctly with the arrow that leads back to _State 3_.
-*  _State 4_ represents again the first screen but this time the user has registered. From that state if the user clicks the register button again he stays in the same state. If he presses the Find Relays button he can now proceed to _State 2_.
-
-<a id="Figure_5">
+<p id="Figure_6">
 ![State Machine](img/UDP_state_machine.png)
-<div style='text-align:center'>Figure 5. UDPClient State Machine</div>
-</a>
+<div style='text-align:center'>Figure 6. UDPClient State Machine</div>
+</p>
 
 As can be seen from the state machine we chose to keep just these words since they were the only ones responsible of meaningful transitions.
 All the others would have resulted just in loops on the same state.
@@ -286,19 +301,19 @@ We decided to add one of these loops as a proof of concept adding the `RelayList
 
 Another big obstacle that we encountered while working with the state machine learner was the reset of the application.
 We explained earlier that the initial version of the tool wasn't performing any kind of reset of the application returning meaningless state machines.
-In  [Figure 6](Figure_6) we have a simplified example of a state machine generated without resetting the application before each query.
+In  [Figure 7](Figure_7) we have a simplified example of a state machine generated without resetting the application before each query.
 We removed useless transitions from the dot file to make the graph smaller and more readable but the significant part of the graph is still there.
-As can be observed comparing the graph in [Figure 5](Figure_5) and the one in [Figure 6](Figure_6) the transitions in the latter have no logical connections.
+As can be observed comparing the graph in [Figure 6](Figure_6) and the one in [Figure 7](Figure_7) the transitions in the latter have no logical connections.
 The learner believed that it was possible to reach the `spinnerTarget` from _S<sub>0</sub>_ when this is not even in the first page of the application.
 After interpreting this graph we realized that we had a problem with the tool and digging into the code we figured out that we needed to set up the reset conditions for which the application had to be restarted.
 At the beginning we erroneously set the reset condition just when the system was reaching the final page and clicking on the the `RelayListView`.
 Then, as explained before, we fixed this error and the one connected with the restart process after talking with the teachers.
 
 
-<a id="Figure_6">
+<p id="Figure_7">
 ![Wrong State Machine](img/UDP_wrong_state_machine.png)
-<div style='text-align:center'>Figure 6. UDPClient  Wrong State Machine</div>
-</a>
+<div style='text-align:center'>Figure 7. UDPClient  Wrong State Machine</div>
+</p>
 
 ### Discussions (maybe)
 * Summerize what we were able to do and what not
@@ -310,16 +325,16 @@ SageMath is a free open-source mathematics software system licensed under the GP
 ### SageMath Fuzzing
 With the SageMath application we stumbled upon problems while using the fuzzing tool, as we mentioned before. After analyzing the applications architecture and implementation, we discovered some weak points that could be exploited with fuzzing.
 
-1. The application communicated with a server to send the math equations that were gonna be executed and received the results. This connection was re-established every time with the click of one button([Figure 7](Figure_7)). Therefore, we tried to exhaust the application resources for network capacity and crash it. Although we succeeded when we were manually performing the clicks, with the use of the fuzzing tool the click emulation was too slow to be successful.
+1. The application communicated with a server to send the math equations that were gonna be executed and received the results. This connection was re-established every time with the click of one button([Figure 8](Figure_8)). Therefore, we tried to exhaust the application resources for network capacity and crash it. Although we succeeded when we were manually performing the clicks, with the use of the fuzzing tool the click emulation was too slow to be successful.
 2. The application was using a SQLite database to store strings that were inserted by the user. The problem in this case was that SageMath was using a `Dialogue` layout to insert the new user string. Therefore, the `OK` button could not be retrieved through the XML layout file.   We used the fuzzing tool to insert random input into the field and then called  the `clickSpecific` function for the `OK` button. After various text inputs, the application crashed when a large text was inserted. This occurred because the text was not inserted into the database cause of its size. As a result the reference towards that text was `null` and led to the applications crash when the application tried to display it
 3. One extra functionality of the application was to let the user insert any code he wanted which was executed from the server. The weak point in this case was specific input that caused the server to answer with a `null`. When this occurred the android application crashed during the parsing of the `null` object with the `Gson` library. We believe that although we discovered this kind of weakness, it is not part of the fuzzing process since the input has to be specifically defined but it is worth mentioning.
 
 
 
-<a id="Figure_7">
+<p id="Figure_8">
 ![SageMath Fuzzing 1](img/socketFuzzing.png)![SageMath Fuzzing 2](img/groupNameFuzzing.png)
-<div style='text-align:center'>Figure 7. SageMath Fuzzing          </div>
-</a>
+<div style='text-align:center'>Figure 8. SageMath Fuzzing          </div>
+</p>
 
 
 ### Sage State Machine
@@ -328,7 +343,7 @@ The SageMath application is rather large with complex functionality.
 It is not feasible to try to make a state machine for the whole application because of the time it would take.
 It is however interesting to see a state machine for one of the cases we discussed when fuzzing the application.
 As previously said, we discovered that the application would crash if given a specific input for a name when creating a group.
-We therefore chose this procecure to create an FSM, when a user tries to create a new group with a name like shown in [Figure 7](Figure_7).
+We therefore chose this procecure to create an FSM, when a user tries to create a new group with a name like shown in [Figure 8](Figure_8).
 The user presses the + on the menu and then he can enter a text, press Cancel or press OK.
 The alphabet therefore was made out of the following (shortened) words:
 * push%button1 (OK)
@@ -336,11 +351,11 @@ The alphabet therefore was made out of the following (shortened) words:
 * enterText%groupText
 * push%menu_add
 
-The following figure shows the corresponding FSM ([Figure 11](Figure_11)):
+The following figure shows the corresponding FSM ([Figure 9](Figure_9)):
 
-<a id="Figure_8">
-![SageMath FSM](img/sage_create.png) <div style='text-align:center'>Figure 8. SageMath FSM        </div>
-</a>
+<p id="Figure_9">
+![SageMath FSM](img/sage_create.png) <div style='text-align:center'>Figure 9. SageMath FSM        </div>
+</p>
 
 * **State 0**: The original state of the application in the first screen.
 Here the only possible action from the alphabet is to press the menu_add button.
