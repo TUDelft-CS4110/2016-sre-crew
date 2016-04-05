@@ -245,9 +245,9 @@ As mentioned before the first thing to do is to create the alphabet.
 After dumping all the three screens ([Figure 5](#Figure_5)) of the application, `alphabet:compose` was used to retrieve the alphabet.
 
 <p id = "Figure 5"></p>
-<img src="/img/main_screen.png" width="150">
-<img width="150" src="/img/second_page.png">
-<img width="150" src="/img/third_page.png">
+<img src="/img/main_screen.png" width="250">
+<img width="250" src="/img/second_page.png">
+<img width="250" src="/img/third_page.png">
 
 
 <div style='text-align:center'>Figure 5. Alphabet Elements        </div>  
@@ -298,6 +298,14 @@ As can be seen from the state machine we chose to keep just these words since th
 All the others would have resulted just in loops on the same state.
 We decided to add one of these loops as a proof of concept adding the `RelayListView` that starts and ends in _S<sub>3</sub>_, but keeping all of them would have been a barrier in producing the final automaton.
 
+There is one state in the FSM that might seem peculiar which is state 3.
+In the FSM it is only possible to continue in this state or go to state 1 which is what happens when no actions are found.
+This therefore appears to be a dead end in the FSM.
+That is however not the real case since Android applications rely on the back button in many situations, this one being one of those.
+The back button is however not a part of the fsm-learner and therefore gives the wrong impression of this state.
+Besides that, this state machine accurately shows what happens when using the UDPClient application.
+All other states and transitions show correct behavior and nothing that is unexpected.
+There was therefore no weird behavior discovered with the FSM which was the expected case, based on the simplicity of the application.
 
 A big obstacle that we encountered early while working with the fsm-learner was the reset of the application.
 We explained earlier that the initial version of the tool wasn't performing any kind of reset of the application returning meaningless state machines.
@@ -314,9 +322,6 @@ Then, as explained before, we fixed this error and the one connected with the re
 ![Wrong State Machine](img/UDP_wrong_state_machine.png)
 <div style='text-align:center'>Figure 7. UDPClient  Wrong State Machine</div>
 
-
-### Discussions (maybe)
-* Summerize what we were able to do and what not
 
 ## SageMath
 
