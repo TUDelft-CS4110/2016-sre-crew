@@ -328,9 +328,9 @@ SageMath is a free open-source mathematics software system licensed under the GP
 ### SageMath Fuzzing
 With the SageMath application we stumbled upon problems while using the fuzzing tool, as we mentioned before. After analyzing the applications architecture and implementation, we discovered some weak points that could be exploited with fuzzing.
 
-1. The application communicated with a server to send the math equations that were gonna be executed and received the results. This connection was re-established every time with the click of one button([Figure 8](#Figure_8)). Therefore, we tried to exhaust the application resources for network capacity and crash it. Although we succeeded when we were manually performing the clicks, with the use of the fuzzing tool the click emulation was too slow to be successful.
-2. The application was using a SQLite database to store strings that were inserted by the user. The problem in this case was that SageMath was using a `Dialogue` layout to insert the new user string. Therefore, the `OK` button could not be retrieved through the XML layout file.   We used the fuzzing tool to insert random input into the field and then called  the `clickSpecific` function for the `OK` button. After various text inputs, the application crashed when a large text was inserted. This occurred because the text was not inserted into the database cause of its size. As a result the reference towards that text was `null` and led to the applications crash when the application tried to display it
-3. One extra functionality of the application was to let the user insert any code he wanted which was executed from the server. The weak point in this case was specific input that caused the server to answer with a `null`. When this occurred the android application crashed during the parsing of the `null` object with the `Gson` library. We believe that although we discovered this kind of weakness, it is not part of the fuzzing process since the input has to be specifically defined but it is worth mentioning.
+1. The application communicated with a server to send the math equations that were going to be executed and received the results. This connection was re-established every time with the click of one button (play button in [Figure 8](#Figure_8)). Therefore, we tried to exhaust the application resources for network capacity and crash it. Although we succeeded when we were manually performing the clicks, with the use of the fuzzing tool the click emulation was too slow to be successful.
+2. The application was using a SQLite database to store strings that were inserted by the user when creating a new group ([Figure 8](#Figure_8)). The problem in this case was that SageMath was using a `Dialogue` layout to insert the new user string. Therefore, the `OK` button could not be retrieved through the XML layout file. We used the fuzzing tool to insert random input into the field and then called  the `clickSpecific` function for the `OK` button. After various text inputs, the application crashed when a large text was inserted. This occurred because the text was not inserted into the database cause of its size. As a result the reference towards that text was `null` and led to a crash when the application tried to display it.
+3. One extra functionality of the application was to let the user insert any code he wanted which was executed from the server. The weak point in this case was a specific input that caused the server to answer with a `null`. When this occurred the android application crashed during the parsing of the `null` object with the `Gson` library. We believe that although we discovered this kind of weakness, it is not part of the fuzzing process since the input has to be specifically defined but it is worth mentioning.
 
 
 
@@ -346,8 +346,8 @@ The SageMath application is rather large with complex functionality.
 It is not feasible to try to make a state machine for the whole application because of the time it would take.
 It is however interesting to see a state machine for one of the cases we discussed when fuzzing the application.
 As previously said, we discovered that the application would crash if given a specific input for a name when creating a group.
-We therefore chose this procecure to create an FSM, when a user tries to create a new group with a name like shown in [Figure 8](#Figure_8).
-The user presses the + on the menu and then he can enter a text, press Cancel or press OK.
+We therefore chose this procedure to create an FSM which is when a user tries to create a new group with a name like shown in [Figure 8](#Figure_8).
+The user presses the + button on the menu and then he can enter a text, press Cancel or press OK.
 The alphabet therefore was made out of the following (shortened) words:  
 
 **☑︎** push%button1 (OK)  
@@ -366,21 +366,18 @@ The following figure shows the corresponding FSM ([Figure 9](#Figure_9)):
 
 
 * **State 0**: The original state of the application in the first screen.
-Here the only possible action from the alphabet is to press the menu_add button.
-* **State 1**: All NOTFOUND actions will lead to this state.
+Here, the only possible action from the alphabet is to press the menu_add button.
+* **State 1**: All not found actions will lead to this sink state.
 * **State 2**: After pressing the menu_add button this state is reached.
 From here the popup is visible and it is possible to enter the groupText or press either of the two buttons, OK or Cancel.
-Pressing Cancel will close the popup and lead back to state 0.
-Pressing OK without having any text entered will not do anything since it is now allowed to create a new group with empty text.
-* **State 3**: Entering text will lead to a new state since now pressing OK has different consequences.
-Like before, pressing Cancel will close the popup and return to state 0.
-Now, pressing OK will create a new group with the name entered in the text field and then close the popup and return to state 0.
+Pressing Cancel will close the popup and lead back to _S<sub>0</sub>_.
+Pressing OK without having any text entered will not do anything since it is not allowed to create a new group with empty text.
+* **State 3**: Entering text in _S<sub>2</sub>_ will lead to a new state since now pressing OK has different consequences.
+Like before, pressing Cancel will close the popup and return to _S<sub>0</sub>_.
+Now, pressing OK will create a new group with the name entered in the text field and then close the popup and return to _S<sub>0</sub>_.
 
 This state machine is an accurate description of what happens if these actions are performed in the application.
 In this small example, there don't seem to be any mysterious states or any unwanted transitions.
-
-### Discussions (maybe) (I say we include the discussion in each section of the app)
-* Summerize what we were able to do and what not
 
 ## Future Work / Conclusion
 After extending the implemented tools, we had an automated process to fuzz android applications with random inputs and random actions on its elements. Using this we were able to successfully fuzz two applications and gain better insight about them. Moreover, the type of fuzzing cases varied from text input to random click actions.
