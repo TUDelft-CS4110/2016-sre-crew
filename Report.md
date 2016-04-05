@@ -43,11 +43,11 @@ In order to fuzz an android application, we need to be able to emulate random ac
 **fuzzer-android-server**: This is a server that runs on the background of the android application. First it starts the socket so it can receive the data, in the form of `ActionInstruction` objects and then waits for the incoming data. The information is parsed and interpreted using the `UIAutomator`. The [`UIAutomator`](http://developer.android.com/tools/testing-support-library/index.html#UIAutomator) is a UI testing framework that provides a set of APIs in order to provide interaction with a user app. Specifically the implemented functionalities utilize the API calls of the two android objects [`UiObject`](http://developer.android.com/reference/android/support/test/uiautomator/UiObject.html) and  [`UiDevice`](http://developer.android.com/reference/android/support/test/uiautomator/UiDevice.html).
 
 **fuzzer-pc-client**: The pc-client is in charge of creating actions e.g. click a button or insert an input to a text field and then send them to the server. The user can create an XML file and insert the actions he wants to emulate with a specific format. The chance of an action being picked and sent to the server can be specific as well as the order of the actions. Once the XML file is parsed, actions are translated into action objects and sent to the server through the socket.  
-In  [Figure 1](#Figure__1) we have the overview of how the tool works:
+In  [Figure 1](#Figure_1) we have the overview of how the tool works:
 
 <p id="Figure_1"></p>
-![Fuzzing Tool](img/Fuzzing-tool.png)
-<div style='text-align:center'>Figure 1. Fuzzing Tool Architecture</div>
+![Fuzzing Tool](img/Fuzzing-tool.png)  
+Figure 1. Fuzzing Tool Architecture
 
 
 #### Working with the tool
@@ -97,11 +97,9 @@ We added two  function calls inside the `DriveUiAutomator.java` which exposed tw
 
 Based on these two new functionalities, we introduced a XML template file with actions that automate the process of fuzzing any android application. For the template, the user needs to put the target application on the top left corner of the android virtual device and the devices size should be that of a normal  phone and not tablet. The action set consists of three sub action sets that are the three steps in the fuzzing process which we can see in [Figure 2](#Figure_2) :
 
-
 <p id="Figure_2"></p>
-![XML Template](img/xml_file.png)
-<div style='text-align:center'>Figure 2. XML Action Set</div>
-
+![XML Template](img/xml_file.png)  
+Figure 2. XML Action Set
 
 1. The first action clicks on the coordinates on the top left corner of the android device where we have placed the target application as we can see in [Figure 3](#Figure_3). Also we get the string that shows the current package name to verify that we are inside the application.
 
@@ -113,8 +111,8 @@ At the end of the fuzzing process, the user can analyze the output and compare t
 
 
 <p id="Figure_3"></p>
-![Application Position](img/app_position.png)![Crash Position](img/error_position.png)
-<div style='text-align:center'>Figure 3. Android Application and Android Crash Button Position          </div>
+![Application Position](img/app_position.png)![Crash Position](img/error_position.png)  
+Figure 3. Android Application and Android Crash Button Position
 
 ### fsm-learner
 
@@ -230,8 +228,8 @@ The application does not include many fuzzing points from the perspective that t
 3. The available text input for a user are two text fields that correspond to a server IP and Port. After fuzzing with random inputs there was no successful input that crashed this application. As a result from the perspective of text fuzzing, there are no weak points.
 
 <p id="Figure_4"></p>
-![Fuzzing case](img/udpclientFuzzing.png) ![Fuzzing case 2](img/udpclientFuzzing2.png)
-<div style='text-align:center'>Figure 4. UDPClient Fuzzing Points          </div>
+![Fuzzing case](img/udpclientFuzzing.png) ![Fuzzing case 2](img/udpclientFuzzing2.png)  
+Figure 4. UDPClient Fuzzing Points
 
 
 ### UDPClient State Machine
@@ -243,12 +241,10 @@ As mentioned before the first thing to do is to create the alphabet.
 After dumping all the three screens ([Figure 5](#Figure_5)) of the application, `alphabet:compose` was used to retrieve the alphabet.
 
 <p id = "Figure 5"></p>
-<img src="/img/main_screen.png" width="250">
-<img width="250" src="/img/second_page.png">
-<img width="250" src="/img/third_page.png">
-
-
-<div style='text-align:center'>Figure 5. Alphabet Elements        </div>  
+<img src="/img/main_screen.png" width="270">
+<img width="270" src="/img/second_page.png">
+<img width="270" src="/img/third_page.png">  
+Figure 5. UDPClient Alphabet Elements
 
 The alphabet retrieved was composed by 11 words.
 These are listed below and are split into different sections based on the screen they refer to.
@@ -288,8 +284,8 @@ The corresponding state machine is displayed in [Figure 6](#Figure_6).
 *  **State 4**: represents again the first screen but this time the user has registered. From that state if the user clicks the register button again he stays in the same state. If he presses the Find Relays button he can now proceed to _S<sub>2</sub>_.
 
 <p id="Figure_6"></p>
-![State Machine](img/UDP_state_machine.png)
-<div style='text-align:center'>Figure 6. UDPClient State Machine</div>
+![State Machine](img/UDP_state_machine.png)  
+Figure 6. UDPClient State Machine
 
 
 As can be seen from the state machine we chose to keep just these words since they were the only ones responsible of meaningful transitions.
@@ -317,8 +313,8 @@ Then, as explained before, we fixed this error and the one connected with the re
 
 
 <p id="Figure_7"></p>
-![Wrong State Machine](img/UDP_wrong_state_machine.png)
-<div style='text-align:center'>Figure 7. UDPClient  Wrong State Machine</div>
+![Wrong State Machine](img/UDP_wrong_state_machine.png)  
+Figure 7. UDPClient  Wrong State Machine
 
 
 ## SageMath
@@ -332,13 +328,9 @@ With the SageMath application we stumbled upon problems while using the fuzzing 
 2. The application was using a SQLite database to store strings that were inserted by the user when creating a new group ([Figure 8](#Figure_8)). The problem in this case was that SageMath was using a `Dialogue` layout to insert the new user string. Therefore, the `OK` button could not be retrieved through the XML layout file. We used the fuzzing tool to insert random input into the field and then called  the `clickSpecific` function for the `OK` button. After various text inputs, the application crashed when a large text was inserted. This occurred because the text was not inserted into the database cause of its size. As a result the reference towards that text was `null` and led to a crash when the application tried to display it.
 3. One extra functionality of the application was to let the user insert any code he wanted which was executed from the server. The weak point in this case was a specific input that caused the server to answer with a `null`. When this occurred the android application crashed during the parsing of the `null` object with the `Gson` library. We believe that although we discovered this kind of weakness, it is not part of the fuzzing process since the input has to be specifically defined but it is worth mentioning.
 
-
-
 <p id="Figure_8"></p>
-![SageMath Fuzzing 1](img/socketFuzzing.png)![SageMath Fuzzing 2](img/groupNameFuzzing.png)
-<div style='text-align:center'>Figure 8. SageMath Fuzzing          </div>
-
-
+![SageMath Fuzzing 1](img/socketFuzzing.png)![SageMath Fuzzing 2](img/groupNameFuzzing.png)  
+Figure 8. SageMath Fuzzing
 
 ### Sage State Machine
 
@@ -346,7 +338,7 @@ The SageMath application is rather large with complex functionality.
 It is not feasible to try to make a state machine for the whole application because of the time it would take.
 It is however interesting to see a state machine for one of the cases we discussed when fuzzing the application.
 As previously said, we discovered that the application would crash if given a specific input for a name when creating a group.
-We therefore chose this procedure to create an FSM which is when a user tries to create a new group with a name like shown in [Figure 8](#Figure_8).
+We therefore chose this procedure to create an FSM which is when a user tries to create a new group with a name like shown in [Figure 9](#Figure_9).
 The user presses the + button on the menu and then he can enter a text, press Cancel or press OK.
 The alphabet therefore was made out of the following (shortened) words:  
 
@@ -355,15 +347,16 @@ The alphabet therefore was made out of the following (shortened) words:
 **☑︎** enterText%groupText  
 **☑︎** push%menu_add  
 
-
-<img style="width: 200px; margin-left:10px; margin-top:10px" src="/img/sage_main.png">
-<img style="width: 200px; margin-left:10px; margin-top:10px;" src="/img/sage_create_group.png">  
-
-The following figure shows the corresponding FSM ([Figure 9](#Figure_9)):
-
 <p id="Figure_9"></p>
-![SageMath FSM](img/sage_create.png) <div style='text-align:center'>Figure 9. SageMath FSM        </div>
+<img width="350" src="/img/sage_main.png">
+<img width="350" src="/img/sage_create_group.png">  
+Figure 9. SageMath Alphabet Elements
 
+The following figure shows the corresponding FSM ([Figure 10](#Figure_10)):
+
+<p id="Figure_10"></p>
+![SageMath FSM](img/sage_create.png)  
+Figure 10. SageMath FSM
 
 * **State 0**: The original state of the application in the first screen.
 Here, the only possible action from the alphabet is to press the menu_add button.
