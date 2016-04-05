@@ -298,8 +298,8 @@ As can be seen from the state machine we chose to keep just these words since th
 All the others would have resulted just in loops on the same state.
 We decided to add one of these loops as a proof of concept adding the `RelayListView` that starts and ends in _S<sub>3</sub>_, but keeping all of them would have been a barrier in producing the final automaton.
 
-There is one state in the FSM that might seem peculiar which is state 3.
-In the FSM it is only possible to continue in this state or go to state 1 which is what happens when no actions are found.
+There is one state in the FSM that might seem peculiar which is _S<sub>3</sub>_.
+In the FSM it is only possible to continue in this state or go to _S<sub>1</sub>_ which is what happens when no actions are found.
 This therefore appears to be a dead end in the FSM.
 That is however not the real case since Android applications rely on the back button in many situations, this one being one of those.
 The back button is however not a part of the fsm-learner and therefore gives the wrong impression of this state.
@@ -325,14 +325,14 @@ Then, as explained before, we fixed this error and the one connected with the re
 
 ## SageMath
 
-SageMath is a free open-source mathematics software system licensed under the GPL [[3](#sagemath)]. It builds on top of many existing open-source packages: NumPy, SciPy, matplotlib, Sympy, Maxima, GAP, FLINT, R and many more. Moreover, SageMath won the  first prize in the scientific software division of Les Trophées du Libre, an international competition for free software in 2007. In 2012 it was one of the projects selected for the Google Summer of Code. These reasons led us to choose this application and try to fuzz it.
+SageMath is a free open-source mathematics software system licensed under the GPL [[3](#sagemath)]. It builds on top of many existing open-source packages: NumPy, SciPy, matplotlib, Sympy, Maxima, GAP, FLINT, R and many more. Moreover, SageMath won the  first prize in the scientific software division of Les Trophées du Libre, an international competition for free software in 2007. In 2012 it was one of the projects selected for the Google Summer of Code. Based on these facts which establish the validity of the application, we chose to fuzz it.
 
 ### SageMath Fuzzing
-With the SageMath application we stumbled upon problems while using the fuzzing tool, as we mentioned before. After analyzing the applications architecture and implementation, we discovered some weak points that could be exploited with fuzzing.
+With the SageMath application we stumbled upon problems while using the fuzzing tool, as we mentioned before. Based on the added functionalities of the fuzzing tool we were able to overcome these problems. As a result, after analyzing the applications architecture and implementation, we discovered some weak points that could be exploited with fuzzing.
 
 1. The application communicated with a server to send the math equations that were gonna be executed and received the results. This connection was re-established every time with the click of one button([Figure 8](#Figure_8)). Therefore, we tried to exhaust the application resources for network capacity and crash it. Although we succeeded when we were manually performing the clicks, with the use of the fuzzing tool the click emulation was too slow to be successful.
 2. The application was using a SQLite database to store strings that were inserted by the user. The problem in this case was that SageMath was using a `Dialogue` layout to insert the new user string. Therefore, the `OK` button could not be retrieved through the XML layout file.   We used the fuzzing tool to insert random input into the field and then called  the `clickSpecific` function for the `OK` button. After various text inputs, the application crashed when a large text was inserted. This occurred because the text was not inserted into the database cause of its size. As a result the reference towards that text was `null` and led to the applications crash when the application tried to display it
-3. One extra functionality of the application was to let the user insert any code he wanted which was executed from the server. The weak point in this case was specific input that caused the server to answer with a `null`. When this occurred the android application crashed during the parsing of the `null` object with the `Gson` library. We believe that although we discovered this kind of weakness, it is not part of the fuzzing process since the input has to be specifically defined but it is worth mentioning.
+3. One extra functionality of the application was to let the user insert any code he wanted which was executed from the server. The weak point in this case was specific input that caused the server to answer with a `null`. When this occurred the android application crashed during the parsing of the `null` object with the `Gson` library. The crashing in this case was the result of an error in the implementation of the NumPy that executed the commands on the server part. We believe that although this kind of weakness is worth mentioning, it is not part of the fuzzing process since the input has to be specifically defined.
 
 
 
@@ -385,7 +385,13 @@ In this small example, there don't seem to be any mysterious states or any unwan
 * Summerize what we were able to do and what not
 
 ## Future Work / Conclusion
-After extending the implemented tools, we had an automated process to fuzz android applications with random inputs and random actions on its elements. Using this we were able to successfully fuzz two applications and gain better insight about them. Moreover, the type of fuzzing cases varied from text input to random click actions.
+After extending the implemented tools, we had an automated process to fuzz android applications with random inputs and random actions on its elements. Using this we were able to successfully fuzz two applications and gain better insight about them.
+Another possible approach to obtain the same result could be to implement the fuzzer using `appium` instead of `UIAutomator`.
+In fact, when using appium in the fsm-learner we were able to overcome all the problems that we encountered with the UIAutomator-based fuzzer and, for example, to reach buttons inside dialogs.
+Moreover, using just appium for both of the tools provided by this suite would be an improvement in cohesion and stability.
+
+On the finite state machine learning aspect, we showed that it is possible to retrieve an automaton representing the workflow of the application.
+However, as we mentioned before, a possible improvement would be to add the possibility to press the back button in order to generate a more accurate state machine.     
 
 ## References
 
