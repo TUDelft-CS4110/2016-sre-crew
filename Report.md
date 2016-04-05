@@ -203,12 +203,13 @@ We had therefore much less knowledge about the subject which significantly slowe
 ## Applications used
 
 After getting these tools to work we could finally apply them on two Android applications.
-In the time of starting this project, we did not have any application that we had wrote that fitted nicely for this tool (e.g. had non-xml layout).
+In the time of starting this project, we did not have any application that we had written that fitted nicely for this tool (e.g. had non-xml layout).
 We therefore looked for Open Source Android applications that might be interesting to apply these tools on.
 We found the [SageMath](https://github.com/sagemath/android) application which is a mathematics software to calculate and plot graphs from a given input.
 Later on in the project, one of the team members had finished work on another course (Hacking Lab) where he created an application for peer to peer communication, called UDPClient.
 We thought it would be very interesting to also apply the tool on our own written code.
-Also, after having had some trouble with using the SageMath application, we hoped that it would be
+We began by applying the tool on SageMath but quickly decided to move our focus on UDPClient since it was much smaller and we had a better understanding of it.
+Finally after successfully applying the tool on UDPClient, we returned to SageMath.
 These two applications and the process of applying the tools on them will be described in the next sections.
 
 ## UDPClient
@@ -216,7 +217,7 @@ These two applications and the process of applying the tools on them will be des
 The UDPClient application is part of the Hacking Lab course assignment of one of our team members. This application is used for peer to peer communication between devices that have the application installed. Every peer first registers to a server and then retrieves information about other registered peers. With the use of the new added functionalities on the fuzzing tool we tried to fuzz it.
 
 ### UDPClient Fuzzing
-The application does not include many fuzzing points from the perspective that the user cannot insert many different inputs. However, the network architecture of the application exposes different cases where connection variables could have not be initiated properly. Therefore, in our action XML file we included random click actions of buttons with a random chance as well as various text inputs. After running the fuzzing tool for a few hours, we discovered two weak points that caused the application to crash.
+The application does not include many fuzzing points from the perspective that the user cannot insert many different inputs. However, the network architecture of the application exposes different cases where connection variables could have not been initiated properly. Therefore, in our action XML file we included random click actions of buttons with a random chance as well as various text inputs. After running the fuzzing tool for a few hours, we discovered two weak points that caused the application to crash.
 
 1. If a user tried to get the list of registered peers without having first connected to the server ([Figure 4](#Figure_4)), the application did not handle correctly the `null` reference and crashed. The existing code did the following check
   ````java
@@ -228,28 +229,29 @@ The application does not include many fuzzing points from the perspective that t
 
 3. The available text input for a user are two text fields that correspond to a server IP and Port. After fuzzing with random inputs there was no successful input that crashed this application. As a result from the perspective of text fuzzing, there are no weak points.
 
-
-
 <p id="Figure_4"></p>
 ![Fuzzing case](img/udpclientFuzzing.png) ![Fuzzing case 2](img/udpclientFuzzing2.png)
 <div style='text-align:center'>Figure 4. UDPClient Fuzzing Points          </div>
 
 
-
-
 ### UDPClient State Machine
+Before creating the FSM for the UDPClient, the error described in step 1 in the fuzzing part was fixed.
+If this error was included, the last action of the query execution sometimes caused the crash.
+In that case it was not possible to test a counterexample since no screen was open and therefore no possible actions available.
 
-As mentioned before the first thing to do is creating the alphabet.
-After dumping all the 3 screens [Figure 5](#Figure_5)of the application `alphabet:compose` has been used to retrieve the alphabet.
+As mentioned before the first thing to do is to create the alphabet.
+After dumping all the three screens ([Figure 5](#Figure_5)) of the application, `alphabet:compose` was used to retrieve the alphabet.
+
 <p id = "Figure 5"></p>
-<img style="width: 150px; margin-left:10px; margin-top:10px" src="/img/main_screen.png">
-<img style="width: 150px; margin-left:10px; margin-top:10px" src="/img/second_page.png">
-<img style="width: 150px; margin-left:10px; margin-top:10px; clear:left" src="/img/third_page.png">
+<img src="/img/main_screen.png" width="150">
+<img width="150" src="/img/second_page.png">
+<img width="150" src="/img/third_page.png">
 
-<div style='text-align:center'>Figure 5. Alphabet Elements        </div>
+
+<div style='text-align:center'>Figure 5. Alphabet Elements        </div>  
 
 The alphabet retrieved was composed by 11 words.
-These are listed below split into different sections based on the screen they refer to.
+These are listed below and are split into different sections based on the screen they refer to.
 
 **☐** enterText% AddressText  
 **☐** enterText% PortText  
@@ -267,21 +269,21 @@ These are listed below split into different sections based on the screen they re
 
 
 
-The checked ones are the one that has been included in the final version of the alphabet to build the FSM.
+The checked words are the ones that have been included in the final version of the alphabet to build the FSM.
 Deciding not to include all the words of the original alphabet into the final one was a a forced choice.
 In fact, we let the learner run for many hours with the complete alphabet without any result.
 The main problems were the speed of appium and the computational power of the laptop on which we were running the experiment.
 All the simulations have been run on the android emulator.
-Running the complete system on a single machine was slowing down significantly the performances of the laptop taking a lot of time for the emulator to perform the actions (many time the emulator got stuck for several minutes before starting again).
-Summing this problem with the slow speed of appium's communication after a whole night running the learner didn't even try a counterexample.
+Running the complete system on a single machine was slowing down significantly the performances of the laptop taking a lot of time for the emulator to perform the actions (several times the emulator got stuck for several minutes before starting again).
+Summing this problem with the slow speed of appium's communication after a whole night running, the learner didn't even try a counterexample.
 Therefore we decided to shrink down the alphabet to the most meaningful words in term of state of the system.
 Otherwise it would have required too much time in order to being able to obtain a state machine with the full alphabet.
-These words are the one checked on the list above.
+These words are the ones checked in the list above.
+The corresponding state machine is displayed in [Figure 6](#Figure_6).  
 
-The following state machine that was created represents correctly the behavior of the UDPClient application.  
-* **State 0**: represents the first  screen of the aplication. The possible actions on this screen are either the 'Connect/Register to Server' or 'Find Relays' button. If the latter is pressed then the user cannot proceed since he first needs to connect to the server. We can see this behavior with the find_relays arrow that stays at _S<sub>0</sub>_. On the other hand if the user clicks the first button he moves to _S<sub>4</sub>_.
+* **State 0**: represents the first  screen of the application. The possible actions on this screen are either the 'Connect/Register to Server' or the 'Find Relays' button. If the latter is pressed then the user cannot proceed since he first needs to connect to the server. We can see this behavior with the find_relays arrow that stays at _S<sub>0</sub>_. On the other hand if the user clicks the first button he moves to _S<sub>4</sub>_.
 * **State 1**: represents the state where all actions arrive if the corresponding alphabet element is not found.
-* **State 2**: represents the state where the user can only press the Relaybutton which as we can see leads to another state.
+* **State 2**: represents the state where the user can only press the RelayButton which as we can see leads to another state and the user sees another screen.
 * **State 3**: represents the final screen of the application. In this case the only part of the alphabet that is available is the RelayListView which when clicked remains in the same page. As we can see in the state machine this is represented correctly with the arrow that leads back to _S<sub>3</sub>_.
 *  **State 4**: represents again the first screen but this time the user has registered. From that state if the user clicks the register button again he stays in the same state. If he presses the Find Relays button he can now proceed to _S<sub>2</sub>_.
 
@@ -294,7 +296,8 @@ As can be seen from the state machine we chose to keep just these words since th
 All the others would have resulted just in loops on the same state.
 We decided to add one of these loops as a proof of concept adding the `RelayListView` that starts and ends in _S<sub>3</sub>_, but keeping all of them would have been a barrier in producing the final automaton.
 
-Another big obstacle that we encountered while working with the state machine learner was the reset of the application.
+
+A big obstacle that we encountered early while working with the fsm-learner was the reset of the application.
 We explained earlier that the initial version of the tool wasn't performing any kind of reset of the application returning meaningless state machines.
 In  [Figure 7](#Figure_7) we have a simplified example of a state machine generated without resetting the application before each query.
 We removed useless transitions from the dot file to make the graph smaller and more readable but the significant part of the graph is still there.
