@@ -8,7 +8,8 @@ What is common to most software is that it should work correctly and not have bu
 To ensure correctness, software has to be tested extensively.
 With software getting more complex, the more difficult it is to test it.
 Alongside the constant evolution of software, new automated testing methods have also been introduced.
-In this paper we discuss two state-of-the-art techniques for testing the correctness of software: Fuzzing and State Machine Learning, and apply these techniques on Android applications using a modern testing tool.
+In this paper we discuss two state-of-the-art techniques for testing the correctness of software: Fuzzing and State Machine Learning.
+Afterwards, we apply these techniques on Android applications using a modern testing tool.
 
 The reason why we analyze these two methods is because of a tool that was made less than a year ago at Delft University of Technology.
 This tool was developed as a Bachelor project for the IT bank company [bunq](https://www.bunq.com) to test their iOS and Android applications.
@@ -16,7 +17,7 @@ The tool is split in two parts, [fuzzer](https://github.com/bunqcom/fuzzer) for 
 The tool was made specifically for the bunq applications but with some configuration changes it is possible to apply it on other applications.
 
 In this paper we will analyze the fuzzer and fsm-learner tools and apply them on two very different applications.
-The progress of using the tool will be described, the results from using it along with alternations made to the tool and possible future work.
+The progress of using the tool will be described, the results from using it along with alterations made to the tool and possible future work.
 
 ### Fuzzing
 
@@ -29,20 +30,20 @@ The concept behind it remains the same, the difference resides in the purpose.
 ### State Machines
 
 Finite State Machines (FSM) can be used to examine and test software implementations.
-Analyzing FSM's can provide information about possible bugs and deadlocks and can show if all possible paths in the software are correct and secure [[4](#sm-slides)].
-It could happen that transitions or states are identified that are not supposed to be there or when entering a certain state, it is not possible to get to another state from there.
-Besides finding unwanted behavior, FSM's can provide developers with a better understanding of a system's implementation.
+Analyzing FSMs can provide information about possible bugs and deadlocks and can show if all possible paths in the software are correct and secure [[4](#sm-slides)].
+It could happen that transitions or states are identified that are not supposed to be there or when entering a certain state, it is not possible to get to another state.
+Besides finding unwanted behavior, FSMs can provide developers with a better understanding of a system's implementation.
 
 ## Tools
 
 Hereafter we will describe the two tools that were used and the complications with using them.
 
 ### fuzzer
-In order to fuzz an android application, we need to be able to emulate random actions, insert input into the android device and analyze the results. For that reason we use the fuzzing tool mentioned in the introduction. The user can specify actions which vary from clicking a button to entering random text to an input field and then emulate them on the android application. With the repetition of a random  set of random actions, eventually the user may be able to find a sequence that will crash the application. The architecture of the tool consists of two  sub-applications, one android background application alled fuzzer-android-server that runs on the target device and one desktop application called Pc-Client that sends information to the android application. The communication between these two applications is established through a socket connection for sending data back and forth.
+In order to fuzz an android application, we need to be able to emulate random actions, insert input into the android device and analyze the results. For that reason we use the fuzzing tool mentioned in the introduction. The user can specify actions which vary from clicking a button to entering random text to an input field and then emulate them on the android application. With the repetition of a random  set of random actions, eventually the user may be able to find a sequence that will crash the application. The architecture of the tool consists of two  sub-applications, one android background application code called fuzzer-android-server that runs on the target device and one desktop application called Pc-Client that sends information to the android application. The communication between these two applications is established through a socket connection for sending data back and forth.
 
 **fuzzer-android-server**: This is a server that runs on the background of the android application. First it starts the socket so it can receive the data, in the form of `ActionInstruction` objects and then waits for the incoming data. The information is parsed and interpreted using the `UIAutomator`. The [`UIAutomator`](http://developer.android.com/tools/testing-support-library/index.html#UIAutomator) is a UI testing framework that provides a set of APIs in order to provide interaction with a user app. Specifically the implemented functionalities utilize the API calls of the two android objects [`UiObject`](http://developer.android.com/reference/android/support/test/uiautomator/UiObject.html) and  [`UiDevice`](http://developer.android.com/reference/android/support/test/uiautomator/UiDevice.html).
 
-**fuzzer-pc-client**: The pc-client is in charge of creating actions e.g. click a button or insert an input to a text field and then send them to the server. The user can create an XML file and insert the actions he wants to emulate with a specific format. The chance of an action being picked and sent to the server can be specific as well as the order of the actions. Once the XML file is parsed, actions are translated into action objects and sent to the server through the socket.  
+**fuzzer-pc-client**: The pc-client is in charge of creating actions e.g. click a button or insert an input to a text field and then send them to the server. The user can create an XML file and insert the actions he wants to emulate with a specific format. The chance of an action being picked and sent to the server can be specified as well as the order of the actions. Once the XML file is parsed, actions are translated into action objects and sent to the server through the socket.  
 In  [Figure 1](#Figure__1) we have the overview of how the tool works:
 
 <p id="Figure_1"></p>
@@ -51,12 +52,12 @@ In  [Figure 1](#Figure__1) we have the overview of how the tool works:
 
 
 #### Working with the tool
-In our analysis with the tool, we found some limitations with the existing implementation and added our own functionalities to extend the capabilities of the tool. Below we describe these limitations and what we suggest to improve the tool.  
+In our analysis with the tool, we found some limitations with the existing implementation and added our own functionalities to extend the capabilities of the tool. Below we describe these limitations and how we suggest to improve the tool.  
 
-First of all, an action can be applied only to an element that exists as part of the android `layout.xml`. Modern applications tend to use less and less pre-defined XML elements in their activities and instead dynamically generate them through the code. Elements like `Dialogues` and their  buttons or `ActionBarFragment` do not include XML elements for their UI components. As a result the tool in its current state cannot reach all the possible states of an application. Furthermore, the socket communication between the client and server causes a delay when applying the emulated action on the running application. This can limit the fuzzing on the perspective of exhausting memory or network resources. Finally when the fuzzer successfully crashes the running application there doesn't seem to be a clear way to identify this result on the fuzzer-pc-client. Because of this problem the fuzzing process we described before cannot be repeated automatically.For our fuzzing implementation, we used a file with various values as input. The input stretched form text strings of various sizes to numbers and special characters.
+First of all, an action can be applied only to an element that exists as part of the android `layout.xml`. Modern applications tend to use less and less pre-defined XML elements in their activities and instead dynamically generate them through the code. Elements like `Dialogues` and their  buttons or `ActionBarFragment` do not include XML elements for their UI components. As a result the tool in its current state cannot reach all the possible states of an application. Furthermore, the socket communication between the client and server causes a delay when applying the emulated action on the running application. This can limit the fuzzing on the perspective of exhausting memory or network resources. Finally when the fuzzer successfully crashes the running application there doesn't seem to be a clear way to identify this result on the fuzzer-pc-client. Because of this problem the fuzzing process we described before cannot be repeated automatically. For our fuzzing implementation, we used a file with various values as input. The input stretched from text strings of various sizes to numbers and special characters.
 
 #### Additions
-For the aforementioned reasons we decided to extend the tool and add some functionalities that partially solve some of the mentioned problems. Afterwards, we use the new functionalities to automate the fuzzing process.
+For the aforementioned reasons we decided to extend the tool and add some functionalities that partially solve the mentioned problems. Afterwards, we use the new functionalities to automate the fuzzing process.
 
 We added two  function calls inside the `DriveUiAutomator.java` which exposed two new values that can be inserted in the `action` field of the XML.
 
@@ -95,7 +96,7 @@ We added two  function calls inside the `DriveUiAutomator.java` which exposed tw
   }
   ````
 
-Based on these two new functionalities, we introduced a XML template file with actions that automate the process of fuzzing any android application. For the template, the user needs to put the target application on the top left corner of the android virtual device and the devices size should be that of a normal  phone and not tablet. The action set consists of three sub action sets that are the three steps in the fuzzing process which we can see in [Figure 2](#Figure_2) :
+Based on these two new functionalities, we introduced a XML template file with actions that automate the process of fuzzing any android application. For the template, the user needs to put the target application on the top left corner of the android virtual device and the device's size should be that of a normal  phone and not tablet. The action set consists of three sub action sets that are the three steps in the fuzzing process which we can see in [Figure 2](#Figure_2) :
 
 
 <p id="Figure_2"></p>
@@ -122,7 +123,7 @@ The purpose of this tool is translating an application into a finite state machi
 * **𝚺** is the alphabet that the FSM accepts.
 This considered in the case of an android application is the list of possible actions available in every specific screen of the application (`EditText`,`CheckBox`, `Button`, etc.).
 * **S** represents a set of states which needs to be _finite_ and _non-empty_.
-* **S<sub>0</sub>** is the start state of the application
+* **S<sub>0</sub>** is the start state of the application.
 * **𝛅** is the transition function (`S x 𝚺 -> S`).
 This represent the transition from one state to the other accepting a specific element of the alphabet.
 * **F** is a finite set of final states (`F ⊆ S`). This can be empty if the system doesn't have any final state.
@@ -140,14 +141,14 @@ action%param1#param2#...#paramx
 ```
 The % separates the action from the parameters and the # separates the parameters.
 The actions available are `push`, `check` and `enterText`.
-One of these three actions combined with the parameters that represent the xPath of the specific component creates a word for the alphabet.
+One of these three actions combined with the parameters that represent the XPath of the specific component creates a word for the alphabet.
 An example of such a word is:  
 ```
 push%//android.widget.FrameLayout[1][@index='0' and @resource-id='' and contains(@text, '') and @content-desc='']/android.widget.ListView[1][@index='0' and @resource-id='' and contains(@text, '') and @content-desc='']#125#65
 ```  
 
 This represents the action of pushing an element contained in a `ListView`.
-The tool provide two functionalities for the purpose of generating this alphabet:
+The tool provides two functionalities for the purpose of generating this alphabet:
 1. The first one `alphabet:create` helps the user dumping the screens of the application.
 2. The second one `alphabet:compose` merges all the actions obtained from the screen dumps and composes the alphabet of the finite state machine.
 
@@ -160,8 +161,9 @@ These actions are sent to the device using [appium](http://appium.io) which make
 It is in charge of providing the teacher with the action that should be executed.
 After the action is executed the learner stores the result provided  by the teacher to refine its knowledge about the system.
 These answers can be `0-OK` or `1-NOTFOUND` depending on the fact that the system is able to perform or not such an action from that specific condition.
-When it considers to have an accurate representation of the system under learning (_SUL_), it tries to test this representation sending the generated state machine to the teacher so that it can test it with different _counterexamples_.
-If the tests succeed the learning procedure stops and provides the user with a `dot` graph of the system. Otherwise it starts a new learning round improved with what went wrong in the last round.
+When it considers to have an accurate representation of the system under learning (_SUL_), it tries to test this representation by sending the generated state machine to the teacher so that it can test it with different _counterexamples_.
+If the tests succeed the learning procedure stops and provides the user with a `dot` graph of the system.
+Otherwise it starts a new improved learning round.
 
 Afterwards, when the automata is generated it contains the different states that depict the system along with a sink state where all the action that are not accepted from a state (all those marked as `1-NOTFOUND`) go.
 
@@ -170,7 +172,7 @@ The tool offers possibilities to restart the execution of a query after having e
 This can be done in three possible ways: _hard reset, soft reset_ and _semi-soft reset_.
 The hard reset completely restarts the application while the soft reset serves more like a back button functionality, bringing the application back to the overview screen.
 The specific actions are specified in the config file, represented with the words from the alphabet.
-Before each new query it is checked if a reset should occur, which will happen if the last successfully executed action was specified in the config.
+Before a new query happens,  it is  checked if a reset should occur, which will happen if the last successfully executed action was specified in the config.
 This was most likely implemented so that when reaching a final state, where it is not possible to go to any new state, it would be possible to continue the exploration.
 This way it is possible to not include the back buttons in the state machines, which would otherwise make them much more complicated.
 
@@ -182,7 +184,7 @@ In the early stages we had troubles with running the tool without errors and the
 Firstly, there was a script missing from the repository on GitHub that was necessary to create the alphabet from the UI screen dumps.
 Luckily, we could contact the developers of the tool and get the missing script.
 We tried to use the previously described method `alphabet:create` to create the alphabet but there were errors in the code that we were unable to fix.
-Instead we bypasses that method and used a script of theirs to manually create the alphabet.
+Instead we bypassed that method and used a script of theirs to manually create the alphabet.
 In this process we also had troubles with interactions with Appium.
 There had been some changes in the Appium code after the publication of the tool so we had to update the code to match those changes [[1](#type-change)].
 
