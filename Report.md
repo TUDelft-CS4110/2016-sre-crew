@@ -376,7 +376,7 @@ Now, pressing OK will create a new group with the name entered in the text field
 This state machine is an accurate description of what happens if these actions are performed in the application.
 In this small example, there don't seem to be any mysterious states or any unwanted transitions.
 
-## Conclusion and Future work 
+## Conclusion and Future work  
 After extending the implemented tools, we had an automated process to fuzz android applications with random inputs and random actions on its elements. Using this we were able to successfully fuzz two applications and gain better insight about them.
 Another possible approach to obtain the same result could be to implement the fuzzer using `appium` instead of `UIAutomator`.
 In fact, when using appium in the fsm-learner we were able to overcome all the problems that we encountered with the UIAutomator-based fuzzer and, for example, to reach buttons inside dialogs.
