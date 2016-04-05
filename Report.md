@@ -216,7 +216,7 @@ These two applications and the process of applying the tools on them will be des
 
 ## UDPClient
 
-The UDPClient application is part of the Hacking Lab course assignment of one of our team members. This application is used for peer to peer communication between devices that have the application installed. Every peer first registers to a server and then retrieves information about other registered peers. With the use of the new added functionalities on the fuzzing tool we tried to fuzz it.
+The UDPClient application is part of the Hacking Lab course assignment of one of our team members. This application is used for peer to peer communication between devices that have the application installed. Every peer first registers to a server and then retrieves information about other registered peers. With the use of the new added functionalities of the fuzzing tool we tried to fuzz it.
 
 ### UDPClient Fuzzing
 The application does not include many fuzzing points from the perspective that the user cannot insert many different inputs. However, the network architecture of the application exposes different cases where connection variables could have not been initiated properly. Therefore, in our action XML file we included random click actions of buttons with a random chance as well as various text inputs. After running the fuzzing tool for a few hours, we discovered two weak points that caused the application to crash.
@@ -225,7 +225,7 @@ The application does not include many fuzzing points from the perspective that t
   ````java
   if ( !(MyRouter == null) && MyRouter.registered)
   ````
-  However, the second condition was also evaluated even though the `MyRouter` variable was null. This caused the application to crash.
+  However, the MyRouter class is initialized but the specific object variable `registered` is null. This caused the application to crash.
 
 2. The second weak point that was discovered with the fuzzing tool was a set of actions that ignored some UI elements that are preventing actual users from performing actions. While the application is retrieving from the server the list of users there is a `ProgessDialog` ([Figure 4](#Figure_4)) to prevent the user from clicking something. Normally users do not ignore this message but the fuzzing tool kept emulating actions. When a click on the `See Relays` button was emulated but the server had not responded yet with the actual list this caused a `null` reference and crashed the application. In the following picture we can see the `ProgressDialog` and the `See Relays` button in the background.
 
@@ -239,7 +239,7 @@ The application does not include many fuzzing points from the perspective that t
 ### UDPClient State Machine
 Before creating the FSM for the UDPClient, the error described in step 1 in the fuzzing part was fixed.
 If this error was included, the last action of the query execution sometimes caused the crash.
-In that case it was not possible to test a counterexample since no screen was open and therefore no possible actions available.
+In that case it was not possible to test a counterexample since no screen was open and therefore no possible actions were available.
 
 As mentioned before the first thing to do is to create the alphabet.
 After dumping all the three screens ([Figure 5](#Figure_5)) of the application, `alphabet:compose` was used to retrieve the alphabet.
