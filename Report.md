@@ -379,11 +379,14 @@ In this small example, there don't seem to be any mysterious states or any unwan
 ## Conclusion and Future work  
 After extending the implemented tools, we had an automated process to fuzz android applications with random inputs and random actions on its elements. Using this we were able to successfully fuzz two applications and gain better insight about them.
 Another possible approach to obtain the same result could be to implement the fuzzer using `appium` instead of `UIAutomator`.
-In fact, when using appium in the fsm-learner we were able to overcome all the problems that we encountered with the UIAutomator-based fuzzer and, for example, to reach buttons inside dialogs.
+In fact, when using appium in the fsm-learner we were able to overcome many problems that we encountered with the UIAutomator-based fuzzer and, for example, to reach buttons inside dialogs.
 Moreover, using just appium for both of the tools provided by this suite would be an improvement in cohesion and stability.
 
-On the finite state machine learning aspect, we showed that it is possible to retrieve an automaton representing the workflow of the application.
-However, as we mentioned before, a possible improvement would be to add the possibility to press the back button in order to generate a more accurate state machine.     
+Regarding the finite state machine learning, we showed that it is possible to retrieve an automaton representing the procedures of an application.
+However, this was only feasible for a small part of an application since the tools have limitations regarding execution speed.
+Additionally, a possible improvement would be to add the possibility to press the back button in order to generate a more accurate state machine.
+The provided FSM contributes interesting information about a system but because of the aforementioned reasons it is
+difficult to expect that one can discover any bugs or design flaws in an application.
 
 ## References
 
